@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="English">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>CANMAKE Studio© - Media Tool</title>
+        <link rel="icon" class="icon" type="image/png" href="letter-c.png">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" type="text/css" href="canvas.css">
+        <script src="canvas.js"></script>
+        <!-- Google font import: League Spartan -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@100..900&display=swap" rel="stylesheet">
+    </head>
+
+    <body>
+        <div id="threeheaders">
+            <header id="firstheader">
+                <div class="mainimage">
+                    <img class="icon" src="logo.png" alt="hi">
+                </div>
+                canmake.
+            </header>
+        <header id="toolbar"></header>
+        </div>
+
+        <div class="pulloutmenu">
+            <div class="buttonholder">
+
+
+            </div>
+        </div>
+
+        <div id="centercanvas">
+        <canvas id="canvas"></canvas>
+            </div>
+        <div class="toolbox">
+                <div class="buttonholder">
+                <img class="buttons" id="draw" src="brush.png" title="Draw" alt="Draw">
+                <img class="buttons" id="insert" src="picture.png" title="Insert Image" alt="Insert Image" onclick="setBackgroundImage()">
+                <img class="buttons" id="layer" src="layer.png" title="Add Layer" alt="Add Layer">
+                <img class="buttons" id="font" src="font.png" alt="Add Text" title="Add Text">
+                <img class="buttons" id="fliphor" src="flip.png" alt="Flip Canvas Horizontally" title="Flip Canvas Horizontally">
+                <img class="buttons" id="flipvert" src="flipvert.png" alt="Flip Canvas Vertically" title="Flip Canvas Vertically">
+                <input type="color" id="colorpicker" value="#ffffff" title="Colorpicker">
+          </div>
+        </div>
+    </body>
+</html>
