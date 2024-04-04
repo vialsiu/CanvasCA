@@ -35,16 +35,21 @@
 
         <div id="centercanvas">
         <canvas id="canvas"></canvas>
-            </div>
+        </div>
         <div class="toolbox">
                 <div class="buttonholder">
-                <img class="buttons" id="draw" src="brush.png" title="Draw" alt="Draw">
-                <img class="buttons" id="insert" src="picture.png" title="Insert Image" alt="Insert Image" onclick="setBackgroundImage()">
-                <img class="buttons" id="layer" src="layer.png" title="Add Layer" alt="Add Layer">
-                <img class="buttons" id="font" src="font.png" alt="Add Text" title="Add Text">
-                <img class="buttons" id="fliphor" src="flip.png" alt="Flip Canvas Horizontally" title="Flip Canvas Horizontally">
-                <img class="buttons" id="flipvert" src="flipvert.png" alt="Flip Canvas Vertically" title="Flip Canvas Vertically">
+                <img class="buttons" id="select" onclick="selectTool()" src="cursor.png" title="Select" alt="Select">
+                <img class="buttons" id="save" onclick="saveCanvas()" src="diskette.png" title="Save" alt="Save">
+                <img class="buttons" id="insert" onclick="insertImage()" src="picture.png" title="Insert Image" alt="Insert Image">
+                <img class="buttons" id="duplicate" src="duplicate.png" title="Duplicate" alt="Duplicate">
+                <img class="buttons" id="fliphor" src="flip.png" onclick="flipHorizontal()" alt="Flip Canvas Horizontally" title="Flip Canvas Horizontally">
+                <img class="buttons" id="flipvert" src="flipvert.png" onclick="flipVertical()" alt="Flip Canvas Vertically" title="Flip Canvas Vertically">
                 <input type="color" id="colorpicker" value="#ffffff" title="Colorpicker">
+                <img class="buttons" id="draw" src="brush.png" title="Draw" alt="Draw">
+                <img class="buttons" id="eraser" src="eraser.png" alt="Eraser" title="Eraser">
+                <img class="buttons" onclick="selectElement()" id="" src="flipvert.png" alt="Flip Canvas Vertically" title="Flip Canvas Vertically">
+                <img class="buttons" id="textInput" placeholder="Enter text here" src="font.png" alt="Add Text" title="Add Text">
+
           </div>
         </div>
     </body>
