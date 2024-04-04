@@ -1,7 +1,10 @@
 let canvas = null;
 let ctx = null;
 let img = null;
-let paths = []; // Array to store paths
+let paths = [];
+let currentColor = null;
+
+
 
 //let image = 'wony.jpg';
 let isEraserMode = false;
@@ -25,33 +28,29 @@ function onAllAssetsLoaded() {
     //};
     //img.src = image;
 }
-// Function to redraw all saved paths
-/*function redrawPaths() {
-    console.log("FAG")
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    paths.forEach(path => {
-        if (path.length > 1) {
-            ctx.beginPath();
-            ctx.moveTo(path[0].x, path[0].y);
-            path.forEach(point => {
-                ctx.lineTo(point.x, point.y);
-            });
-            ctx.stroke();}
-    });
-}*/
 function redrawPaths() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    console.log(paths)
     paths.forEach(path => {
         if (path.length > 1) {
             ctx.beginPath();
             ctx.moveTo(path[0].x, path[0].y);
+            ctx.strokeStyle = path[0].currentColor ;
+
+console.log(path[0].currentColor)
+
+
+
+
             for (let i = 1; i < path.length; i++) {
                 const point = path[i];
                 if (point.isEraser) {
                     ctx.clearRect(point.x - 5, point.y - 5, 10, 10); 
                 } else {
+
+                    ctx.strokeStyle= point.currentColor;
                     ctx.lineTo(point.x, point.y);
                 }
             }
@@ -84,17 +83,21 @@ function flipVertical() {
 //(Aesthetic purposes) Update toolbar background = colorpicker,
 // EXCEPT the light pink colour at defaut (default) or white
 window.addEventListener('DOMContentLoaded', function () {
-    var defaulthexvalue = "#D1C7C7";
-    var colorpicker = document.getElementById("colorpicker");
+    let defaulthexvalue = "#D1C7C7";
+    let colorpicker = document.getElementById("colorpicker");
     colorpicker.value = defaulthexvalue;
 });
 
 window.addEventListener('DOMContentLoaded', function () {
-    var colorpicker = document.getElementById("colorpicker");
-    var defaultToolbarBackground = "linear-gradient(to right, #e6b8b7, #e6c0b8, #e6c8b8, #e6d0b8, #e6d8b8, #e6e0b8, #dfe6b8, #d7e6b8, #cfe6b8, #c7e6b8, #b8e6be, #b8e6c6, #b8e6ce, #b8e6d6, #b8e6de)";
+    let colorpicker = document.getElementById("colorpicker");
+    let defaultToolbarBackground = "linear-gradient(to right, #e6b8b7, #e6c0b8, #e6c8b8, #e6d0b8, #e6d8b8, #e6e0b8, #dfe6b8, #d7e6b8, #cfe6b8, #c7e6b8, #b8e6be, #b8e6c6, #b8e6ce, #b8e6d6, #b8e6de)";
+    
+    
     function changeToolbarColor() {
-        var toolbar = document.getElementById("toolbar");
-        var selectedColor = colorpicker.value;
+        currentColor = colorpicker.value;
+
+        let toolbar = document.getElementById("toolbar");
+        let selectedColor = colorpicker.value;
         if (selectedColor.toUpperCase() === "#FFFFFF" || selectedColor.toUpperCase() === "#D1C7C7") {
             toolbar.style.background = defaultToolbarBackground;
         } else {
@@ -142,9 +145,9 @@ document.addEventListener("DOMContentLoaded", function () {
         if (!drawEnabled && !eraseEnabled) return;
         isDrawing = true;
         if (eraseEnabled) {
-            paths.push([]); // Create a new empty path in the array
+            paths.push([]);
         } else {
-            paths.push([{ x: NaN, y: NaN }]); // Start a new path with a "dummy" point
+            paths.push([{ x: NaN, y: NaN }]);
         }
         addPoint(e);
         //[lastX, lastY] = [e.offsetX, e.offsetY];
@@ -167,25 +170,23 @@ document.addEventListener("DOMContentLoaded", function () {
     // Function to add a point to the current path
     function addPoint(e) {
         const rect = canvas.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        //paths[paths.length - 1].push({ x, y });
-        /*if (eraseEnabled) {
-            // Remove nearby points from all paths
-            paths.forEach(path => {
-                path = path.filter(point => {
-                    return Math.sqrt((point.x - x) ** 2 + (point.y - y) ** 2) > 10; // Adjust the eraser size as needed
-                });
-            });
-        } else {
-            // Add the point to the current path
-            paths[paths.length - 1].push({ x, y });
-        }*/
-
+        let x = e.clientX - rect.left;
+        let y = e.clientY - rect.top;
+    
+        // If the canvas is flipped horizontally, reverse the x-coordinate
+        if (ctx.getTransform().a === -1) {
+            x = canvas.width - x;
+        }
+    
+        // If the canvas is flipped vertically, reverse the y-coordinate
+        if (ctx.getTransform().d === -1) {
+            y = canvas.height - y;
+        }
+    
         if (eraseEnabled) {
-            paths[paths.length - 1].push({ x, y, isEraser: true }); // Add the point with eraser flag
+            paths[paths.length - 1].push({ x, y, isEraser: true });
         } else {
-            paths[paths.length - 1].push({ x, y }); // Add the point without eraser flag
+            paths[paths.length - 1].push({ x, y, currentColor });
         }
     }
 
@@ -230,8 +231,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
 //Save button
 function saveCanvas() {
-    var dataURL = canvas.toDataURL();
-    var link = document.createElement('a');
+    let dataURL = canvas.toDataURL();
+    let link = document.createElement('a');
     link.href = dataURL;
     link.download = 'canvas_image.png';
     link.click();
@@ -239,17 +240,17 @@ function saveCanvas() {
 
 //Insert button
 function insertImage() {
-    var input = document.createElement('input');
+    let input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
     input.addEventListener('change', function (event) {
-        var file = event.target.files[0];
+        let file = event.target.files[0];
 
         if (file) {
-            var reader = new FileReader();
+            let reader = new FileReader();
 
             reader.onload = function (e) {
-                var img = new Image();
+                let img = new Image();
                 img.onload = function () {
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
