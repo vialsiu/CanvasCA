@@ -41,9 +41,6 @@ function redrawPaths() {
 
 console.log(path[0].currentColor)
 
-
-
-
             for (let i = 1; i < path.length; i++) {
                 const point = path[i];
                 if (point.isEraser) {
