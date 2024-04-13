@@ -17,7 +17,7 @@ let images = [
 
 
 let drawBtn = null;
-let eraserBtn = null;
+// let eraserBtn = null;
 let currentImageIndex = 0;
 
 let offsetX = 0;
@@ -27,10 +27,10 @@ let radius = 10;
 let scribbleCanvas = null; 
 let scribbleCanvasCtx = null; 
 
-let eraserCanvas = null;
-let eraserCanvasCtx = null;
+// let eraserCanvas = null;
+// let eraserCanvasCtx = null;
 let scribbleEnabled = false;
-let eraseEnabled = false;
+// let eraseEnabled = false;
 
 window.onload = onAllAssetsLoaded;
 document.write("<div id='sf_loadingMessage'>Loading...</div>");
@@ -53,10 +53,10 @@ function onAllAssetsLoaded() {
     scribbleCanvas.width = canvas.clientWidth;
     scribbleCanvas.height = canvas.clientHeight;
 
-    eraserCanvas = document.createElement("canvas");
-    eraserCanvasCtx = eraserCanvas.getContext("2d");
-    eraserCanvas.width = canvas.clientWidth;
-    eraserCanvas.height = canvas.clientHeight;
+    // eraserCanvas = document.createElement("canvas");
+    // eraserCanvasCtx = eraserCanvas.getContext("2d");
+    // eraserCanvas.width = canvas.clientWidth;
+    // eraserCanvas.height = canvas.clientHeight;
 
     renderCanvas();
     drawBtn = document.getElementById('sf_drawing');
@@ -76,39 +76,40 @@ function onAllAssetsLoaded() {
     deleteBtn.addEventListener("click", deleteImage);
     document.getElementById('sf_delete').addEventListener('click', deleteImage);
 
+    ctx.fillStyle = "darkgray";
+    ctx.font = "20px Arial";
+    ctx.textAlign = "center"; 
+    ctx.textBaseline = "middle";
+    ctx.fillText("INSERT THE IMAGE", canvas.width / 2, canvas.height / 2); // Placing the text at the center
+}
+
+function renderScribbleCanvas() {
+    ctx.drawImage(scribbleCanvas, 0, 0, canvas.width, canvas.height);
 }
 
 function renderCanvas() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
+    renderScribbleCanvas(); 
     images.forEach((image, index) => {
         offscreenCanvasCtx.clearRect(0, 0, canvas.width, canvas.height);
         if (index === currentImageIndex) {
             offscreenCanvasCtx.fillStyle = "darkgrey";
-            // Save the current canvas state before applying transformations
             offscreenCanvasCtx.save();
-            offscreenCanvasCtx.translate((image.x + image.width / 2), (image.y + image.height / 2)); // Translate to the center of the image
-            offscreenCanvasCtx.rotate(Math.radians(image.rotation)); // Rotate the canvas
-            offscreenCanvasCtx.fillRect(-image.width / 2 - 2, -image.height / 2 - 2, image.width + 4, image.height + 4); // Draw the rotated border
-            // Restore the saved canvas state to reset transformations
+            offscreenCanvasCtx.translate((image.x + image.width / 2), (image.y + image.height / 2));
+            offscreenCanvasCtx.rotate(Math.radians(image.rotation)); 
+            offscreenCanvasCtx.fillRect(-image.width / 2 - 2, -image.height / 2 - 2, image.width + 4, image.height + 4);
             offscreenCanvasCtx.restore();
         }
-        // Apply filters directly to the image
         let filteredImage = applyFilters(image.src, image);
-
-        // Draw the filtered image on the offscreen canvas
-        offscreenCanvasCtx.save(); // Save the current canvas state
-        offscreenCanvasCtx.translate((image.x + image.width / 2), (image.y + image.height / 2)); // Translate to the center of the image
-        offscreenCanvasCtx.rotate(Math.radians(image.rotation)); // Rotate the canvas
-        offscreenCanvasCtx.drawImage(filteredImage, -image.width / 2, -image.height / 2, image.width, image.height); // Draw the image at the translated and rotated position
-        offscreenCanvasCtx.restore(); // Restore the saved canvas state
-
-        // Draw the offscreen canvas on the main canvas
+        offscreenCanvasCtx.save(); 
+        offscreenCanvasCtx.translate((image.x + image.width / 2), (image.y + image.height / 2));
+        offscreenCanvasCtx.rotate(Math.radians(image.rotation));
+        offscreenCanvasCtx.drawImage(filteredImage, -image.width / 2, -image.height / 2, image.width, image.height);
+        offscreenCanvasCtx.restore(); 
         ctx.drawImage(offscreenCanvas, 0, 0, canvas.width, canvas.height);
-        ctx.drawImage(scribbleCanvas, 0, 0, canvas.width, canvas.height);
     });
+    renderScribbleCanvas();
 }
-
 
 
 function applyFilters(image, options) {
@@ -347,17 +348,19 @@ function enableScribble() {
     scribbleEnabled = !scribbleEnabled;
     if(scribbleEnabled)
     {
-    canvas.style.cursor = "crosshair"
-    drawBtn.style.backgroundColor = "#5c5c5c";
-    console.log('true')
+        canvas.style.cursor = "crosshair"
+        drawBtn.style.backgroundColor = "#5c5c5c";
+        console.log('true')
     }   
     else
     {
-    canvas.style.cursor = "default"
-    drawBtn.style.backgroundColor = "#a5a5a5cd";
-    console.log('drawing')
+        canvas.style.cursor = "default"
+        drawBtn.style.backgroundColor = "#a5a5a5cd";
+        console.log('drawing')
     }
+    // renderCanvas();
 }
+
 
 // function eraseScribble() {
 //     // if (scribbleEnabled) 
@@ -437,6 +440,7 @@ function insertImage() {
                         brightness: 0
                     };
                     images.push(newImage);
+                    scribbleEnabled = false;
                     renderCanvas();
                 };
                 img.src = e.target.result;
