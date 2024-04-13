@@ -9,16 +9,10 @@ let imageHeight = 100;
 let imageX = 250;
 let imageY = 250;
 
-let img1 = new Image();
-img1.src = "wony.jpg";
-let img2 = new Image();
-img2.src = "wony.jpg";
-let img3 = new Image();
-img3.src = "wony.jpg";
 let images = [
-    {src: img1, x: 100, y: 100, width: 100, height: 100, rotation: 0, red: 0, green: 0, blue: 0, threshold: false, posterise: false, invert: false, sepia: false, greyscale: false, brightness: 0},
-    {src: img2, x: 200, y: 200, width: 100, height: 100, rotation: 0, red: 0, green: 0, blue: 0, threshold: false, posterise: false, invert: false, sepia: false, greyscale: false, brightness: 0},
-    {src: img3, x: 300, y: 300, width: 100, height: 100, rotation: 0, red: 0, green: 0, blue: 0, threshold: false, posterise: false, invert: false, sepia: false, greyscale: false, brightness: 0}
+    // {src: img1, x: 100, y: 100, width: 100, height: 100, rotation: 0, red: 0, green: 0, blue: 0, threshold: false, posterise: false, invert: false, sepia: false, greyscale: false, brightness: 0},
+    // {src: img2, x: 200, y: 200, width: 100, height: 100, rotation: 0, red: 0, green: 0, blue: 0, threshold: false, posterise: false, invert: false, sepia: false, greyscale: false, brightness: 0},
+    // {src: img3, x: 300, y: 300, width: 100, height: 100, rotation: 0, red: 0, green: 0, blue: 0, threshold: false, posterise: false, invert: false, sepia: false, greyscale: false, brightness: 0}
 ];
 
 
@@ -75,7 +69,13 @@ function onAllAssetsLoaded() {
     window.onmousewheel = document.onmousewheel = mousewheelHandler;
 
     scribbleCanvasCtx.fillStyle = "black"
-    // document.getElementById("colourpicker").value = "#000000"
+
+    let insertBtn = document.getElementById('sf_insert');
+    insertBtn.addEventListener("click", insertImage);
+    let deleteBtn = document.getElementById('sf_delete');
+    deleteBtn.addEventListener("click", deleteImage);
+    document.getElementById('sf_delete').addEventListener('click', deleteImage);
+
 }
 
 function renderCanvas() {
@@ -181,113 +181,6 @@ function applyFilters(image, options) {
 }
 
 
-// function renderCanvas() {
-//     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-//     images.map((image, index) => {
-//         offscreenCanvasCtx.clearRect(0, 0, canvas.width, canvas.height);
-//         if (index === currentImageIndex) {
-//             offscreenCanvasCtx.fillStyle = "darkgrey";
-//             offscreenCanvasCtx.fillRect(image.x - 2, image.y - 2, image.width + 4, image.height + 4);
-//         }
-//         offscreenCanvasCtx.drawImage(image.src, image.x, image.y, image.width, image.height);
-//         imageData = offscreenCanvasCtx.getImageData(image.x, image.y, image.width, image.height);
-
-//         //Red, green, blue
-//         for (let i = 0; i < imageData.data.length; i += 4) {
-//             imageData.data[i + 0] = imageData.data[i + 0] + image.red;
-//             imageData.data[i + 1] = imageData.data[i + 1] + image.green;
-//             imageData.data[i + 2] = imageData.data[i + 2] + image.blue;
-//         }
-//         offscreenCanvasCtx.putImageData(imageData, image.x, image.y);
-
-//         // THRESHOLD
-//         if (image.threshold) {
-//             imageData = offscreenCanvasCtx.getImageData(image.x, image.y, image.width, image.height);
-//             for (let i = 0; i < imageData.data.length; i += 4) {
-//                 for (let rgb = 0; rgb < 3; rgb++) {
-//                     if (imageData.data[i + rgb] < 128) {
-//                         imageData.data[i + rgb] = 0;
-//                     } else {
-//                         imageData.data[i + rgb] = 255;
-//                     }
-//                 }
-//                 imageData.data[i + 3] = 255;
-//             }
-//             offscreenCanvasCtx.putImageData(imageData, image.x, image.y);
-//         }
-
-//         // POSTERISE
-//         if (image.posterise) {
-//             imageData = offscreenCanvasCtx.getImageData(image.x, image.y, image.width, image.height);
-//             for (let i = 0; i < imageData.data.length; i += 4) {
-//                 imageData.data[i + 0] = imageData.data[i + 0] - imageData.data[i + 0] % 64;
-//                 imageData.data[i + 1] = imageData.data[i + 1] - imageData.data[i + 1] % 64;
-//                 imageData.data[i + 2] = imageData.data[i + 2] - imageData.data[i + 2] % 64;
-//                 imageData.data[i + 3] = 255;
-//             }
-//             offscreenCanvasCtx.putImageData(imageData, image.x, image.y);
-//         }
-//         // INVERT
-//         if (image.invert) {
-//             imageData = offscreenCanvasCtx.getImageData(image.x, image.y, image.width, image.height);
-
-//             for (let i = 0; i < imageData.data.length; i += 4) {
-//                 imageData.data[i + 0] = 255 - imageData.data[i + 0];
-//                 imageData.data[i + 1] = 255 - imageData.data[i + 1];
-//                 imageData.data[i + 2] = 255 - imageData.data[i + 2];
-//             }
-//             offscreenCanvasCtx.putImageData(imageData, image.x, image.y);
-//         }
-//         // SEPIA
-//         if (image.sepia) {
-//             imageData = offscreenCanvasCtx.getImageData(image.x, image.y, image.width, image.height);
-//             for (let i = 0; i < imageData.data.length; i += 4) {
-//                 red = imageData.data[i];
-//                 green = imageData.data[i + 1];
-//                 blue = imageData.data[i + 2];
-//                 imageData.data[i] = (red * 0.393) + (green * 0.769) + (blue * 0.189);
-//                 imageData.data[i + 1] = (red * 0.349) + (green * 0.686) + (blue * 0.168);
-//                 imageData.data[i + 2] = (red * 0.272) + (green * 0.534) + (blue * 0.131);
-//             }
-//             offscreenCanvasCtx.putImageData(imageData, image.x, image.y);
-//         }
-
-//         // GREYSCALE
-//         if (image.greyscale)
-//         {
-//             imageData = offscreenCanvasCtx.getImageData(image.x, image.y, image.width, image.height);
-//             for (let i = 0; i < imageData.data.length; i += 4) {
-//                 let grayscale = (imageData.data[i + 0] + imageData.data[i + 1] + imageData.data[i + 2]) / 3;
-//                 imageData.data[i + 0] = grayscale;
-//                 imageData.data[i + 1] = grayscale;
-//                 imageData.data[i + 2] = grayscale;
-//                 imageData.data[i + 3] = 255;
-//             }
-//             offscreenCanvasCtx.putImageData(imageData, image.x, image.y);
-//         }
-
-//         // BRIGHTNESS
-//         imageData = offscreenCanvasCtx.getImageData(image.x, image.y, image.width, image.height);
-//         for (let i = 0; i < imageData.data.length; i += 4) {
-//             imageData.data[i + 0] = imageData.data[i + 0] + image.brightness;
-//             imageData.data[i + 1] = imageData.data[i + 1] + image.brightness;
-//             imageData.data[i + 2] = imageData.data[i + 2] + image.brightness;
-//             imageData.data[i + 3] = 255;
-//         }
-//         offscreenCanvasCtx.putImageData(imageData, image.x, image.y);
-
-//         // ROTATE IMAGE
-//         ctx.save();
-//         ctx.translate((image.x + image.width / 2), (image.y + image.height / 2));
-//         ctx.rotate(Math.radians(image.rotation));
-//         ctx.translate(-(image.x + image.width / 2), -(image.y + image.height / 2));
-//         ctx.drawImage(offscreenCanvas, 0, 0, canvas.width, canvas.height);
-//         ctx.drawImage(scribbleCanvas, 0, 0, canvas.width, canvas.height);
-//         ctx.restore();
-//     });
-// }
-
 //(Aesthetic purposes) Update toolbar background = colorpicker,
 // EXCEPT the light pink colour at defaut (default) or white
 window.addEventListener('DOMContentLoaded', function () {
@@ -368,24 +261,29 @@ function moveHandler(e) {
     }
 }
 
-
+//---------scaling img
 function mousewheelHandler(e) {
     if (currentImageIndex !== null) {
         let canvasBoundingRectangle = canvas.getBoundingClientRect();
         mouseX = e.clientX - canvasBoundingRectangle.left;
         mouseY = e.clientY - canvasBoundingRectangle.top;
-        {
-            let oldCentreX = images[currentImageIndex].x + (images[currentImageIndex].width / 2);
-            let oldCentreY = images[currentImageIndex].y + (images[currentImageIndex].height / 2);
-            images[currentImageIndex].width += e.wheelDelta / 120;
-            images[currentImageIndex].height += e.wheelDelta / 120;
-            images[currentImageIndex].x = oldCentreX - (images[currentImageIndex].width / 2);
-            images[currentImageIndex].y = oldCentreY - (images[currentImageIndex].height / 2);
-            renderCanvas();
+        let oldWidth = images[currentImageIndex].width;
+        let oldHeight = images[currentImageIndex].height;
+        let scaleFactor = 1 - e.deltaY / 1200;
+        let oldCentreX = images[currentImageIndex].x + oldWidth / 2;
+        let oldCentreY = images[currentImageIndex].y + oldHeight / 2;
+        images[currentImageIndex].width *= scaleFactor;
+        images[currentImageIndex].height *= scaleFactor;
+        let newWidth = images[currentImageIndex].width;
+        let newHeight = images[currentImageIndex].height;
+        images[currentImageIndex].x = oldCentreX - newWidth / 2;
+        images[currentImageIndex].y = oldCentreY - newHeight / 2;
+        renderCanvas();
         }
     }
-}
 
+
+//-------am i touching the img
 function mouseIsInsideImage(imageTopLeftX, imageTopLeftY, imageWidth, imageHeight, x, y) {
     if ((x > imageTopLeftX) && (y > imageTopLeftY)) {
         if (x > imageTopLeftX) {
@@ -398,13 +296,15 @@ function mouseIsInsideImage(imageTopLeftX, imageTopLeftY, imageWidth, imageHeigh
                 return false;
             }
         }
-    } else {
+    } 
+    else 
+    {
         return false;
     }
     return true;
 }
 
-//pullout bar functions
+//-----pullout bar filters
     function setRotationDegrees(newRotationDegrees) {
         images[currentImageIndex].rotation = parseInt(newRotationDegrees);
         renderCanvas();
@@ -436,12 +336,6 @@ function mouseIsInsideImage(imageTopLeftX, imageTopLeftY, imageWidth, imageHeigh
     function setRGB(value, color) {
         images[currentImageIndex][color] = parseInt(value);
         renderCanvas();
-
-    function deleteIMG(){
-        console.log('delete img')
-        ctx.clearRect(images[currentImageIndex].x,images[currentImageIndex].y,images[currentImageIndex].x + images[currentImageIndex].width ,images[currentImageIndex].y +images[currentImageIndex].height );
-        renderCanvas();
-    }
 }
 
 function enableScribble() {
@@ -492,19 +386,18 @@ function color(newColor) {
 function radiusSize(newRadiusSize) {
     radius = newRadiusSize;
 }
-
 Math.radians = function (degrees) {
     return degrees * Math.PI / 180;
 }
 
-//Add text function
+//-------text
 function enterText()
 {
 let text = prompt("Enter text here");
 
 }
 
-//Save PNG
+//---------save
 function saveCanvas() {
     let dataURL = canvas.toDataURL();
     let link = document.createElement('a');
@@ -513,33 +406,53 @@ function saveCanvas() {
     link.click();
 }
 
-//upload
-// img.src = URL.createObjectURL(this.files[0]);
+//---------insert btn
 function insertImage() {
-    // uploadImgBtn.classList.remove('hidden');
-    // let fileInput = document.createElement('input');
-    // let removeButton = document.createElement('button');
+    let fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'image/*';
+    fileInput.addEventListener('change', function () {
+        if (this.files && this.files[0]) {
+            let reader = new FileReader();
+            reader.onload = function (e) {
+                let img = new Image();
+                img.onload = function () {
+                    let initialX = (canvas.width - img.width) / 2;
+                    let initialY = (canvas.height - img.height) / 2;
+                    let newImage = {
+                        src: img,
+                        x: initialX,
+                        y: initialY,
+                        width: img.width,
+                        height: img.height,
+                        rotation: 0,
+                        red: 0,
+                        green: 0,
+                        blue: 0,
+                        threshold: false,
+                        posterise: false,
+                        invert: false,
+                        sepia: false,
+                        greyscale: false,
+                        brightness: 0
+                    };
+                    images.push(newImage);
+                    renderCanvas();
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(this.files[0]);
+        }
+    });
+    fileInput.click();
+}
 
-    // fileInput.type = 'file';
-//     fileInput.addEventListener('change', function () {
-//         if (this.files ?. [0]) {
-//             let img = new Image();
-//             img.onload = function () {
-//                 offscreenCanvasCtx.clearRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
-//                 offscreenCanvasCtx.drawImage(img, 0, 0, offscreenCanvas.width, offscreenCanvas.height);
-
-//                 renderCanvas;
-//                 // removeButton.textContent = 'Remove Image';
-//                 // removeButton.addEventListener('click', function () {
-//                 //     ctx.clearRect(0, 0, canvas.width, canvas.height);
-//                 //     offscreenCanvasCtx.clearRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
-//                 //     removeButton.remove();
-//                 // });
-
-//                 // insertImage.appendChild(removeButton);
-//             };
-//             img.src = URL.createObjectURL(this.files[0]);
-//         }
-//     });
-//     fileInput.click();
+//------del
+function deleteImage() {
+    console.log('deleted')
+    if (currentImageIndex !== null) {
+        images.splice(currentImageIndex, 1);
+        currentImageIndex = null;
+        renderCanvas();
+    }
 }
