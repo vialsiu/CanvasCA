@@ -4,10 +4,10 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <title>CANMAKE Studio© - Media Tool</title>
-        <link rel="icon" class="icon" type="image/png" href="letter-c.png">
+        <link rel="icon" class="sf_icon" type="image/png" href="letter-c.png">
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" type="text/css" href="canvas.css">
+        <link rel="stylesheet" type="text/css" href="css/canvas.css">
         <script src="canvas.js"></script>
         <!-- Google font import: League Spartan -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,42 +16,48 @@
     </head>
 
     <body>
-        <div id="threeheaders">
-            <header id="firstheader">
-                <div class="mainimage">
-                    <img class="icon" src="logo.png" alt="hi">
+        <header id="sf_firstheader">
+                <div class="sf_mainimage">
+                    <img class="sf_icon" src="logo.png" alt="hi">
                 </div>
                 canmake.
             </header>
-        <header id="toolbar"></header>
+        <header id="sf_toolbar"></header>
+
+        <div class="sf_pulloutmenu">
+            <div class="sf_buttonholder">
+                <div class="sf_rangeholder" id="sf_textScale"><img class="sf_rangedial" src="textscaling.png" alt="hi"><input type="range" id="sf_textscaling" value="0" min="-255" max="255"/></div>
+                <div class="sf_rangeholder" id="sf_rotation"><img class="sf_rangedial" src="rotate.png" alt="hi"><input type="range" value="0" min="0" max="360" onchange="setRotationDegrees(this.value)"/></div>
+                <div class="sf_rangeholder" id="sf_bright"><img class="sf_rangedial" src="brightness.png" alt="hi"><input type="range" id="sf_brightness" value="0" min="-255" max="255" onchange = "setBrightness(this.value)"/></div>
+                <div class="sf_filterholder">
+                    <img class="sf_buttons2" id="sf_greyscale" onclick="toggleGreyscale(!images[currentImageIndex].greyscale)" alt="greyscale" src="greyscale.png">
+                    <img class="sf_buttons2" id="sf_sepia" onclick="toggleSepia(!images[currentImageIndex].sepia)" src="sepia.png" alt="sepia">
+                    <img class="sf_buttons2" id="sf_invert" onclick="toggleInvert(!images[currentImageIndex].invert)" src="invert.png" alt="invert">
+                    <img class="sf_buttons2" id="sf_posterise" onclick="togglePosterise(!images[currentImageIndex].posterise)" src="pixelate.png" alt="posterise">
+                    <img class="sf_buttons2" id="sf_threshold" onclick="toggleThreshold(!images[currentImageIndex].treshold)" alt="threshold" src="threshold.png">
+                    </div>
+                    <div class="sf_rangeholder" id="sf_redrange"><img class="sf_rangedial" src="rgb.png" alt="hi"><input type="range" id="sf_red" value="0" min="-255" max="255" onchange="setRGB(this.value, 'red')"/></div>
+                    <div class="sf_rangeholder" id="sf_greenrange"><img class="sf_rangedial" src="rgb.png" alt="hi"><input type="range" id="sf_green" value="0" min="-255" max="255" onchange="setRGB(this.value, 'green')"/></div>
+                    <div class="sf_rangeholder" id="sf_bluerange"><img class="sf_rangedial" src="rgb.png" alt="hi"><input type="range" id="sf_blue" value="0" min="-255" max="255" onchange="setRGB(this.value, 'blue')"/></div>
+                </div>
         </div>
 
-        <div class="pulloutmenu">
-            <div class="buttonholder">
-
-
+        <div id="sf_centercanvas">
+        <canvas id="sf_canvas"></canvas>
+        </div>
+        <div class="sf_toolbox">
+                <div class="sf_buttonholder2">
+                <img class="sf_buttons" id="sf_drawing" src="brush.png" title="Draw" alt="Draw">
+                <img class="sf_buttons" id="sf_erasing" src="eraser.png" alt="Eraser" title="Eraser">
+                <img class="sf_buttons" id="sf_insert" onclick="insertImage()" src="picture.png" title="Insert Image" alt="Insert Image">
+                <img class="sf_buttons" id="sf_delete" src="trash.png" title="Duplicate" alt="Duplicate" onclick="deleteIMG(!images[currentImageIndex])">
+                <!-- <img class="sf_buttons" id="fliphor" src="flip.png" onclick="flipHorizontal()" alt="Flip Canvas Horizontally" title="Flip Canvas Horizontally"> -->
+                <!-- <img class="sf_buttons" id="flipvert" src="flipvert.png" onclick="flipVertical()" alt="Flip Canvas Vertically" title="Flip Canvas Vertically"> -->
+                <img class="sf_buttons" onclick="enterText()" id="textInput" placeholder="Enter text here" src="font.png" alt="Add Text" title="Add Text">
+                <img class="sf_buttons" id="sf_save" onclick="saveCanvas()" src="diskette.png" title="Save" alt="Save">
+                <input type="color" onchange="color(this.value)" id="sf_colorpicker" value="#000000" title="Colorpicker">
+                <div class="sf_rangeholder" id="sf_brushScaling"> <img class="sf_rangedial" src="paintroller.png" alt="brush scaling"><input type="range" id="sf_brushScale" min="1" max="100" value="10" onchange="radiusSize(this.value)"></div>
             </div>
-        </div>
-
-        <div id="centercanvas">
-        <canvas id="canvas"></canvas>
-        </div>
-        <div class="toolbox">
-                <div class="buttonholder">
-                <img class="buttons" id="select" onclick="selectTool()" src="cursor.png" title="Select" alt="Select">
-                <img class="buttons" id="save" onclick="saveCanvas()" src="diskette.png" title="Save" alt="Save">
-                <img class="buttons" id="insert" onclick="insertImage()" src="picture.png" title="Insert Image" alt="Insert Image">
-                <img class="buttons" id="duplicate" src="duplicate.png" title="Duplicate" alt="Duplicate">
-                <img class="buttons" id="fliphor" src="flip.png" onclick="flipHorizontal()" alt="Flip Canvas Horizontally" title="Flip Canvas Horizontally">
-                <img class="buttons" id="flipvert" src="flipvert.png" onclick="flipVertical()" alt="Flip Canvas Vertically" title="Flip Canvas Vertically">
-                <input type="color" id="colorpicker" value="#ffffff" title="Colorpicker">
-                <img class="buttons" id="draw" src="brush.png" title="Draw" alt="Draw">
-                <img class="buttons" id="eraser" src="eraser.png" alt="Eraser" title="Eraser">
-                <img class="buttons" onclick="selectElement()" id="" src="flipvert.png" alt="Flip Canvas Vertically" title="Flip Canvas Vertically">
-                <img class="buttons" id="textInput" placeholder="Enter text here" src="font.png" alt="Add Text" title="Add Text">
-                <!-- <label>Rotate</label>--> <input type="range" id="rotation" value="0" min="0" max="360" onchange = "setRotationDegrees(this.value)"/>
-                <br>
-          </div>
         </div>
     </body>
 </html>

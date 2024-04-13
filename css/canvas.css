@@ -1,0 +1,302 @@
+
+body{
+    background-color:rgba(0, 0, 0, 0.607);
+    margin:0;
+    padding:0;
+    overflow: hidden;
+}
+
+#sf_canvas
+{
+    width:600px;
+    height:600px;
+    background-color: rgb(255, 255, 255);
+    margin-top:0vh;
+    box-shadow: 0px 0px 10px 2px rgba(0, 0, 0, 0.197);
+}
+
+textarea {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 1;
+  }
+
+
+
+#sf_colorpicker{
+    display:flex;
+    justify-self: center;
+    align-self:center;
+    justify-content:center;
+    height:5vh;
+    width:16.6vw;
+    box-shadow: 0px 4px 8px rgba(64, 63, 63, 0.4);
+    box-shadow: 0px 0px 10px 2px rgba(0, 0, 0, 0.197);
+    padding:0;
+    margin-right:14.8px;
+    margin-bottom:1.5vh;
+}
+
+#sf_colorpicker:hover{
+    cursor:pointer;
+}
+
+#sf_loadingMessage
+{
+    position:absolute;
+    top:100px;
+    left:100px;
+    z-index:100;
+    font-size:50px;
+}
+
+#sf_centercanvas{
+    display:flex;
+    justify-content: center;
+    align-items:center;
+    margin-top: 5vh;
+    z-index: 1; 
+}
+
+.sf_pulloutmenu{
+    display:flex;
+    justify-content: center;
+    position: absolute;
+    padding-top:12vh;
+    top: 0;
+    left: 0;
+    width: 20vw;
+    height: 100vh;
+    background-color: rgba(54, 54, 54, 0.881);
+    z-index: 1;
+    box-shadow: 1.5px 0px 5px rgba(0, 0, 0, 0.279);
+}
+
+.sf_buttonholder{
+    margin-left:0.5vw;
+    margin-right:0.5vw;
+    text-align: center;
+    margin-top:3vh;
+    max-width:vw;
+
+}
+
+.sf_buttonholder2{
+    margin-left:0.5vw;
+    margin-right:0.5vw;
+    text-align: center;
+    margin-top:3vh;
+    max-width:16.6vw;
+}
+
+h4
+{
+color:rgb(193, 193, 193);
+margin-top:2%;
+margin-bottom:1%;
+font-family: "League Spartan", sans-serif;
+font-weight:400;
+}
+
+.sf_buttons {
+    height: 1.5em;
+    width: 1.5em;
+    background-color: #a5a5a5cd;
+    padding: 0.5em;
+    margin-bottom:1vh;
+    margin-left:0.1em;
+    margin-right:0.1em;
+    border-radius: 0.2em;
+    box-shadow: 2px 2px 4px rgba(5, 5, 5, 0.5);
+    transition: background-color 0.25s;
+}
+
+.sf_buttons2 {
+    height: 2.2em;
+    width: 2.2em;
+    background-color: #a5a5a5cd;
+    padding: 0.5em;
+    margin-bottom:1vh;
+    margin-left:0.1em;
+    margin-right:0.1em;
+    border-radius: 0.2em;
+    box-shadow: 2px 2px 4px rgba(5, 5, 5, 0.5);
+    transition: background-color 0.25s;
+}
+
+
+
+.sf_buttons:hover, .sf_buttons2:hover{
+    background-color: rgba(56, 56, 56, 0.692);
+    transition: background-color 0.25s;
+}
+
+.sf_toolbox{
+    display:flex;
+    justify-content: center;
+    position: absolute;
+    margin-top: 10px;
+    top: 0;
+    right: 0;
+    width: 20vw;
+    max-width:fit-content;
+    height: 100vh;
+    background-color: rgba(54, 54, 54, 0.881);
+    z-index: 1; 
+    box-shadow: -1.5px 0px 4px rgba(0, 0, 0, 0.279);
+    padding-top:10vh;
+    padding-left:2vh;
+    padding-right:2vh;
+}
+
+
+#sf_toolbar{
+    position: relative;
+    z-index: 3; 
+    background: linear-gradient(to right, 
+    #e6b8b7, #e6c0b8, #e6c8b8, #e6d0b8, #e6d8b8, 
+    #e6e0b8, #dfe6b8, #d7e6b8, #cfe6b8, #c7e6b8, 
+    #b8e6be, #b8e6c6, #b8e6ce, #b8e6d6, #b8e6de);    
+    box-shadow: 0px 4px 8px rgba(54, 54, 54, 0.881);
+    height:0.7vh;
+    padding:none;
+    margin:none;
+}
+
+
+
+#sf_firstheader
+{
+    position: relative;
+    z-index: 3; 
+    display:flex;
+    padding-left:1.6em;
+    background-color:rgb(34, 33, 33);
+    color:rgb(255, 255, 255);
+    font-size:2.5em;
+    font-family: "League Spartan", sans-serif;
+    text-transform: lowercase;
+    font-optical-sizing: auto;
+    font-weight: 700;
+    font-style:normal;
+    padding-top:0.4em;
+    padding-bottom:0.2em;
+    border:0;
+}
+.sf_icon{
+    filter:opacity(50%);    
+    margin-left:0.18vw;
+    width:1em;
+    padding-right:0.7vw;
+    filter:brightness(100);
+}
+
+
+.sf_filters
+{
+    border:none;
+    height: 2vh;
+    color:rgb(212, 212, 212);
+    font-family: "League Spartan", sans-serif;
+    padding: 0.7em;
+    margin-bottom:1vh;
+    margin-left:0.1em;
+    margin-right:0.1em;
+    border-radius: 15em;
+    transition: background-color 0.25s;
+    font-weight:600;
+    background-color:rgb(87, 87, 87);
+    box-shadow: 2px 2px 4px rgba(5, 5, 5, 0.5);
+    transition: background-color 0.25s;
+    text-align:center;
+    justify-self:center;
+    
+}
+
+.sf_filters:hover{
+    background-color: rgba(78, 77, 77, 0.692);
+    transition: background-color 0.25s;
+}
+
+/* #textScale{
+    background-color:rgb(192, 52, 52);
+
+} */
+
+.sf_rangeholder
+{
+ display:flex;
+ align-items:center;
+ width:auto;
+ height:5vh;
+ background-color:rgb(78, 78, 78);
+ border-radius: 0.2em;
+ margin-bottom:5%;
+ padding-right:2%;
+ accent-color:#b8bebb;
+ box-shadow: 3px 3px 4px rgb(46, 46, 46);
+}
+
+/* #sf_brushScaling{
+    background-color:rgb(134, 134, 134);
+} */
+
+#sf_rotation{
+    background-color: #727272;
+    accent-color:#b8bebb;
+
+}
+
+#sf_bright{
+    background-color: #878787;
+    accent-color:#b8bebb;
+
+}
+
+#sf_redrange{
+    background-color:rgb(140, 126, 126);
+    accent-color:#b8bebb;
+
+}
+#sf_greenrange{
+    background-color:rgb(126, 140, 128);
+    accent-color:#b8bebb;
+
+}
+#sf_bluerange{
+    background-color:rgb(126, 128, 140);
+    accent-color:#b8bebb;
+}
+
+sf_textScale{
+    background-color:rgb(126, 128, 140);
+    accent-color:#b8bebb;
+}
+
+.sf_rangedial
+{
+    margin-left:0.9vw;
+    width:1.5em;
+    padding-right:0.7vw;
+    filter:opacity(100);
+}
+
+ input[type="range"]{
+    width:12.5vw;
+    /* accent-color:#b8bebb; */
+  }
+
+
+  .sf_filterholder{
+    display:flex;
+    margin-left:2.9vw;
+    margin-right:0.28vw;
+    text-align: center;
+    margin-top:1vh;
+    align-items:center;
+    flex-wrap:nowrap;
+    justify-content:center;
+    max-width:10vw;
+  }
+
