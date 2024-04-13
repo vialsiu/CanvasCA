@@ -78,113 +78,215 @@ function onAllAssetsLoaded() {
     // document.getElementById("colourpicker").value = "#000000"
 }
 
-
 function renderCanvas() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    images.map((image, index) => {
+    images.forEach((image, index) => {
         offscreenCanvasCtx.clearRect(0, 0, canvas.width, canvas.height);
         if (index === currentImageIndex) {
             offscreenCanvasCtx.fillStyle = "darkgrey";
-            offscreenCanvasCtx.fillRect(image.x - 2, image.y - 2, image.width + 4, image.height + 4);
+            // Save the current canvas state before applying transformations
+            offscreenCanvasCtx.save();
+            offscreenCanvasCtx.translate((image.x + image.width / 2), (image.y + image.height / 2)); // Translate to the center of the image
+            offscreenCanvasCtx.rotate(Math.radians(image.rotation)); // Rotate the canvas
+            offscreenCanvasCtx.fillRect(-image.width / 2 - 2, -image.height / 2 - 2, image.width + 4, image.height + 4); // Draw the rotated border
+            // Restore the saved canvas state to reset transformations
+            offscreenCanvasCtx.restore();
         }
-        offscreenCanvasCtx.drawImage(image.src, image.x, image.y, image.width, image.height);
-        imageData = offscreenCanvasCtx.getImageData(image.x, image.y, image.width, image.height);
+        // Apply filters directly to the image
+        let filteredImage = applyFilters(image.src, image);
 
-        //Red, green, blue
-        for (let i = 0; i < imageData.data.length; i += 4) {
-            imageData.data[i + 0] = imageData.data[i + 0] + image.red;
-            imageData.data[i + 1] = imageData.data[i + 1] + image.green;
-            imageData.data[i + 2] = imageData.data[i + 2] + image.blue;
-        }
-        offscreenCanvasCtx.putImageData(imageData, image.x, image.y);
+        // Draw the filtered image on the offscreen canvas
+        offscreenCanvasCtx.save(); // Save the current canvas state
+        offscreenCanvasCtx.translate((image.x + image.width / 2), (image.y + image.height / 2)); // Translate to the center of the image
+        offscreenCanvasCtx.rotate(Math.radians(image.rotation)); // Rotate the canvas
+        offscreenCanvasCtx.drawImage(filteredImage, -image.width / 2, -image.height / 2, image.width, image.height); // Draw the image at the translated and rotated position
+        offscreenCanvasCtx.restore(); // Restore the saved canvas state
 
-        // THRESHOLD
-        if (image.threshold) {
-            imageData = offscreenCanvasCtx.getImageData(image.x, image.y, image.width, image.height);
-            for (let i = 0; i < imageData.data.length; i += 4) {
-                for (let rgb = 0; rgb < 3; rgb++) {
-                    if (imageData.data[i + rgb] < 128) {
-                        imageData.data[i + rgb] = 0;
-                    } else {
-                        imageData.data[i + rgb] = 255;
-                    }
-                }
-                imageData.data[i + 3] = 255;
-            }
-            offscreenCanvasCtx.putImageData(imageData, image.x, image.y);
-        }
-
-        // POSTERISE
-        if (image.posterise) {
-            imageData = offscreenCanvasCtx.getImageData(image.x, image.y, image.width, image.height);
-            for (let i = 0; i < imageData.data.length; i += 4) {
-                imageData.data[i + 0] = imageData.data[i + 0] - imageData.data[i + 0] % 64;
-                imageData.data[i + 1] = imageData.data[i + 1] - imageData.data[i + 1] % 64;
-                imageData.data[i + 2] = imageData.data[i + 2] - imageData.data[i + 2] % 64;
-                imageData.data[i + 3] = 255;
-            }
-            offscreenCanvasCtx.putImageData(imageData, image.x, image.y);
-        }
-        // INVERT
-        if (image.invert) {
-            imageData = offscreenCanvasCtx.getImageData(image.x, image.y, image.width, image.height);
-
-            for (let i = 0; i < imageData.data.length; i += 4) {
-                imageData.data[i + 0] = 255 - imageData.data[i + 0];
-                imageData.data[i + 1] = 255 - imageData.data[i + 1];
-                imageData.data[i + 2] = 255 - imageData.data[i + 2];
-            }
-            offscreenCanvasCtx.putImageData(imageData, image.x, image.y);
-        }
-        // SEPIA
-        if (image.sepia) {
-            imageData = offscreenCanvasCtx.getImageData(image.x, image.y, image.width, image.height);
-            for (let i = 0; i < imageData.data.length; i += 4) {
-                red = imageData.data[i];
-                green = imageData.data[i + 1];
-                blue = imageData.data[i + 2];
-                imageData.data[i] = (red * 0.393) + (green * 0.769) + (blue * 0.189);
-                imageData.data[i + 1] = (red * 0.349) + (green * 0.686) + (blue * 0.168);
-                imageData.data[i + 2] = (red * 0.272) + (green * 0.534) + (blue * 0.131);
-            }
-            offscreenCanvasCtx.putImageData(imageData, image.x, image.y);
-        }
-
-        // GREYSCALE
-        if (image.greyscale)
-        {
-            imageData = offscreenCanvasCtx.getImageData(image.x, image.y, image.width, image.height);
-            for (let i = 0; i < imageData.data.length; i += 4) {
-                let grayscale = (imageData.data[i + 0] + imageData.data[i + 1] + imageData.data[i + 2]) / 3;
-                imageData.data[i + 0] = grayscale;
-                imageData.data[i + 1] = grayscale;
-                imageData.data[i + 2] = grayscale;
-                imageData.data[i + 3] = 255;
-            }
-            offscreenCanvasCtx.putImageData(imageData, image.x, image.y);
-        }
-
-        // BRIGHTNESS
-        imageData = offscreenCanvasCtx.getImageData(image.x, image.y, image.width, image.height);
-        for (let i = 0; i < imageData.data.length; i += 4) {
-            imageData.data[i + 0] = imageData.data[i + 0] + image.brightness;
-            imageData.data[i + 1] = imageData.data[i + 1] + image.brightness;
-            imageData.data[i + 2] = imageData.data[i + 2] + image.brightness;
-            imageData.data[i + 3] = 255;
-        }
-        offscreenCanvasCtx.putImageData(imageData, image.x, image.y);
-
-        // ROTATE IMAGE
-        ctx.save();
-        ctx.translate((image.x + image.width / 2), (image.y + image.height / 2));
-        ctx.rotate(Math.radians(image.rotation));
-        ctx.translate(-(image.x + image.width / 2), -(image.y + image.height / 2));
+        // Draw the offscreen canvas on the main canvas
         ctx.drawImage(offscreenCanvas, 0, 0, canvas.width, canvas.height);
         ctx.drawImage(scribbleCanvas, 0, 0, canvas.width, canvas.height);
-        ctx.restore();
     });
 }
+
+
+
+function applyFilters(image, options) {
+    let filteredImageCanvas = document.createElement('canvas');
+    let filteredImageCtx = filteredImageCanvas.getContext('2d');
+    filteredImageCanvas.width = options.width;
+    filteredImageCanvas.height = options.height;
+
+    filteredImageCtx.drawImage(image, 0, 0, options.width, options.height);
+
+    let imageData = filteredImageCtx.getImageData(0, 0, options.width, options.height);
+
+    // Apply filters
+    for (let i = 0; i < imageData.data.length; i += 4) {
+        // Adjust RGB values
+        imageData.data[i + 0] += options.red; // Red
+        imageData.data[i + 1] += options.green; // Green
+        imageData.data[i + 2] += options.blue; // Blue
+
+        // Threshold
+        if (options.threshold) {
+            let grayscale = (imageData.data[i] + imageData.data[i + 1] + imageData.data[i + 2]) / 3;
+            let threshold = grayscale < 128 ? 0 : 255;
+            imageData.data[i] = threshold; // Red
+            imageData.data[i + 1] = threshold; // Green
+            imageData.data[i + 2] = threshold; // Blue
+        }
+
+        // Posterise
+        if (options.posterise) {
+            imageData.data[i + 0] -= imageData.data[i + 0] % 64; // Red
+            imageData.data[i + 1] -= imageData.data[i + 1] % 64; // Green
+            imageData.data[i + 2] -= imageData.data[i + 2] % 64; // Blue
+        }
+
+        // Invert
+        if (options.invert) {
+            imageData.data[i + 0] = 255 - imageData.data[i + 0]; // Red
+            imageData.data[i + 1] = 255 - imageData.data[i + 1]; // Green
+            imageData.data[i + 2] = 255 - imageData.data[i + 2]; // Blue
+        }
+
+        // Sepia
+        if (options.sepia) {
+            let red = imageData.data[i];
+            let green = imageData.data[i + 1];
+            let blue = imageData.data[i + 2];
+            imageData.data[i] = (red * 0.393) + (green * 0.769) + (blue * 0.189); // Red
+            imageData.data[i + 1] = (red * 0.349) + (green * 0.686) + (blue * 0.168); // Green
+            imageData.data[i + 2] = (red * 0.272) + (green * 0.534) + (blue * 0.131); // Blue
+        }
+
+        // Greyscale
+        if (options.greyscale) {
+            let grayscale = (imageData.data[i] + imageData.data[i + 1] + imageData.data[i + 2]) / 3;
+            imageData.data[i] = grayscale; // Red
+            imageData.data[i + 1] = grayscale; // Green
+            imageData.data[i + 2] = grayscale; // Blue
+        }
+
+        // Adjust brightness
+        imageData.data[i + 0] += options.brightness; // Red
+        imageData.data[i + 1] += options.brightness; // Green
+        imageData.data[i + 2] += options.brightness; // Blue
+    }
+
+    filteredImageCtx.putImageData(imageData, 0, 0);
+
+    return filteredImageCanvas;
+}
+
+
+// function renderCanvas() {
+//     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+//     images.map((image, index) => {
+//         offscreenCanvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+//         if (index === currentImageIndex) {
+//             offscreenCanvasCtx.fillStyle = "darkgrey";
+//             offscreenCanvasCtx.fillRect(image.x - 2, image.y - 2, image.width + 4, image.height + 4);
+//         }
+//         offscreenCanvasCtx.drawImage(image.src, image.x, image.y, image.width, image.height);
+//         imageData = offscreenCanvasCtx.getImageData(image.x, image.y, image.width, image.height);
+
+//         //Red, green, blue
+//         for (let i = 0; i < imageData.data.length; i += 4) {
+//             imageData.data[i + 0] = imageData.data[i + 0] + image.red;
+//             imageData.data[i + 1] = imageData.data[i + 1] + image.green;
+//             imageData.data[i + 2] = imageData.data[i + 2] + image.blue;
+//         }
+//         offscreenCanvasCtx.putImageData(imageData, image.x, image.y);
+
+//         // THRESHOLD
+//         if (image.threshold) {
+//             imageData = offscreenCanvasCtx.getImageData(image.x, image.y, image.width, image.height);
+//             for (let i = 0; i < imageData.data.length; i += 4) {
+//                 for (let rgb = 0; rgb < 3; rgb++) {
+//                     if (imageData.data[i + rgb] < 128) {
+//                         imageData.data[i + rgb] = 0;
+//                     } else {
+//                         imageData.data[i + rgb] = 255;
+//                     }
+//                 }
+//                 imageData.data[i + 3] = 255;
+//             }
+//             offscreenCanvasCtx.putImageData(imageData, image.x, image.y);
+//         }
+
+//         // POSTERISE
+//         if (image.posterise) {
+//             imageData = offscreenCanvasCtx.getImageData(image.x, image.y, image.width, image.height);
+//             for (let i = 0; i < imageData.data.length; i += 4) {
+//                 imageData.data[i + 0] = imageData.data[i + 0] - imageData.data[i + 0] % 64;
+//                 imageData.data[i + 1] = imageData.data[i + 1] - imageData.data[i + 1] % 64;
+//                 imageData.data[i + 2] = imageData.data[i + 2] - imageData.data[i + 2] % 64;
+//                 imageData.data[i + 3] = 255;
+//             }
+//             offscreenCanvasCtx.putImageData(imageData, image.x, image.y);
+//         }
+//         // INVERT
+//         if (image.invert) {
+//             imageData = offscreenCanvasCtx.getImageData(image.x, image.y, image.width, image.height);
+
+//             for (let i = 0; i < imageData.data.length; i += 4) {
+//                 imageData.data[i + 0] = 255 - imageData.data[i + 0];
+//                 imageData.data[i + 1] = 255 - imageData.data[i + 1];
+//                 imageData.data[i + 2] = 255 - imageData.data[i + 2];
+//             }
+//             offscreenCanvasCtx.putImageData(imageData, image.x, image.y);
+//         }
+//         // SEPIA
+//         if (image.sepia) {
+//             imageData = offscreenCanvasCtx.getImageData(image.x, image.y, image.width, image.height);
+//             for (let i = 0; i < imageData.data.length; i += 4) {
+//                 red = imageData.data[i];
+//                 green = imageData.data[i + 1];
+//                 blue = imageData.data[i + 2];
+//                 imageData.data[i] = (red * 0.393) + (green * 0.769) + (blue * 0.189);
+//                 imageData.data[i + 1] = (red * 0.349) + (green * 0.686) + (blue * 0.168);
+//                 imageData.data[i + 2] = (red * 0.272) + (green * 0.534) + (blue * 0.131);
+//             }
+//             offscreenCanvasCtx.putImageData(imageData, image.x, image.y);
+//         }
+
+//         // GREYSCALE
+//         if (image.greyscale)
+//         {
+//             imageData = offscreenCanvasCtx.getImageData(image.x, image.y, image.width, image.height);
+//             for (let i = 0; i < imageData.data.length; i += 4) {
+//                 let grayscale = (imageData.data[i + 0] + imageData.data[i + 1] + imageData.data[i + 2]) / 3;
+//                 imageData.data[i + 0] = grayscale;
+//                 imageData.data[i + 1] = grayscale;
+//                 imageData.data[i + 2] = grayscale;
+//                 imageData.data[i + 3] = 255;
+//             }
+//             offscreenCanvasCtx.putImageData(imageData, image.x, image.y);
+//         }
+
+//         // BRIGHTNESS
+//         imageData = offscreenCanvasCtx.getImageData(image.x, image.y, image.width, image.height);
+//         for (let i = 0; i < imageData.data.length; i += 4) {
+//             imageData.data[i + 0] = imageData.data[i + 0] + image.brightness;
+//             imageData.data[i + 1] = imageData.data[i + 1] + image.brightness;
+//             imageData.data[i + 2] = imageData.data[i + 2] + image.brightness;
+//             imageData.data[i + 3] = 255;
+//         }
+//         offscreenCanvasCtx.putImageData(imageData, image.x, image.y);
+
+//         // ROTATE IMAGE
+//         ctx.save();
+//         ctx.translate((image.x + image.width / 2), (image.y + image.height / 2));
+//         ctx.rotate(Math.radians(image.rotation));
+//         ctx.translate(-(image.x + image.width / 2), -(image.y + image.height / 2));
+//         ctx.drawImage(offscreenCanvas, 0, 0, canvas.width, canvas.height);
+//         ctx.drawImage(scribbleCanvas, 0, 0, canvas.width, canvas.height);
+//         ctx.restore();
+//     });
+// }
 
 //(Aesthetic purposes) Update toolbar background = colorpicker,
 // EXCEPT the light pink colour at defaut (default) or white
@@ -219,55 +321,27 @@ window.addEventListener('DOMContentLoaded', function () {
 
 });
 
-
-
-
-
 function mousedownHandler(e) {
-    if (e.which === 1){
-        if (scribbleEnabled) 
-        {
-        return;
-        }
+    if (e.which === 1) {
         let canvasBoundingRectangle = canvas.getBoundingClientRect();
         mouseX = e.clientX - canvasBoundingRectangle.left;
         mouseY = e.clientY - canvasBoundingRectangle.top;
-        currentImageIndex = null;
+        let clickedInsideImage = false;
         for (let i = images.length - 1; i > -1; i--) {
             if (mouseIsInsideImage(images[i].x, images[i].y, images[i].width, images[i].height, mouseX, mouseY)) {
                 canvas.style.cursor = "pointer"
                 offsetX = mouseX - images[i].x;
                 offsetY = mouseY - images[i].y;
                 currentImageIndex = i;
+                clickedInsideImage = true;
                 renderCanvas();
-                document.getElementById("sf_rotation").value = images[currentImageIndex].rotation;
-                document.getElementById("sf_brightness").value = images[currentImageIndex].brightness;
-                if (images[currentImageIndex].greyscale) {
-                    document.getElementById("sf_greyscale").click();
-                }
-                if (images[currentImageIndex].sepia) {
-                    document.getElementById("sf_sepia").click();
-                }
-                if (images[currentImageIndex].invert) {
-                    document.getElementById("sf_invert").click();
-                }
-                if (images[currentImageIndex].posterise) {
-                    document.getElementById("sf_posterise").click();
-                }
-                if (images[currentImageIndex].threshold) {
-                    document.getElementById("sf_threshold").click();
-                }
-                if (images[currentImageIndex].deleteIMG) {
-                    document.getElementById("sf_deleteIMG").click();
-                }
-                document.getElementById("sf_red").value = images[currentImageIndex].red;
-                document.getElementById("sf_green").value = images[currentImageIndex].green;
-                document.getElementById("sf_blue").value = images[currentImageIndex].blue;
-                break
+                break;
             }
-            else{
-            canvas.style.cursor = "default"
-            }
+        }
+        if (!clickedInsideImage) {
+            canvas.style.cursor = "default";
+            currentImageIndex = null;
+            renderCanvas();
         }
     }
 }
