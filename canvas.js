@@ -20,7 +20,6 @@ let images = [
     {src: img2, x: 200, y: 200, width: 100, height: 100, rotation: 0, red: 0, green: 0, blue: 0, threshold: false, posterise: false, invert: false, sepia: false, greyscale: false, brightness: 0},
     {src: img3, x: 300, y: 300, width: 100, height: 100, rotation: 0, red: 0, green: 0, blue: 0, threshold: false, posterise: false, invert: false, sepia: false, greyscale: false, brightness: 0}
 ];
-// img.src = URL.createObjectURL(this.files[0]);
 
 
 let drawBtn = null;
@@ -226,6 +225,10 @@ window.addEventListener('DOMContentLoaded', function () {
 
 function mousedownHandler(e) {
     if (e.which === 1){
+        if (scribbleEnabled) 
+        {
+        return;
+        }
         let canvasBoundingRectangle = canvas.getBoundingClientRect();
         mouseX = e.clientX - canvasBoundingRectangle.left;
         mouseY = e.clientY - canvasBoundingRectangle.top;
@@ -271,7 +274,7 @@ function mousedownHandler(e) {
 
 
 function moveHandler(e) {
-    if ((currentImageIndex !== null) && (e.which === 1)){
+    if (!scribbleEnabled && currentImageIndex !== null && e.which === 1) {
         let canvasBoundingRectangle = canvas.getBoundingClientRect();
         mouseX = e.clientX - canvasBoundingRectangle.left;
         mouseY = e.clientY - canvasBoundingRectangle.top;
@@ -290,6 +293,7 @@ function moveHandler(e) {
         renderCanvas();
     }
 }
+
 
 function mousewheelHandler(e) {
     if (currentImageIndex !== null) {
