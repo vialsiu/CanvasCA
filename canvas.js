@@ -231,16 +231,18 @@ function mousedownHandler(e) {
         let clickedInsideImage = false;
         for (let i = images.length - 1; i > -1; i--) {
             if (mouseIsInsideImage(images[i].x, images[i].y, images[i].width, images[i].height, mouseX, mouseY)) {
-                canvas.style.cursor = "pointer"
-                offsetX = mouseX - images[i].x;
-                offsetY = mouseY - images[i].y;
-                currentImageIndex = i;
-                clickedInsideImage = true;
-                renderCanvas();
-                break;
+                if (!eraseEnabled) { 
+                    canvas.style.cursor = "pointer";
+                    offsetX = mouseX - images[i].x;
+                    offsetY = mouseY - images[i].y;
+                    currentImageIndex = i;
+                    clickedInsideImage = true;
+                    renderCanvas();
+                    break;
+                }
             }
         }
-        if (!clickedInsideImage) {
+        if (!clickedInsideImage && !eraseEnabled) { 
             canvas.style.cursor = "default";
             currentImageIndex = null;
             renderCanvas();
@@ -248,9 +250,8 @@ function mousedownHandler(e) {
     }
 }
 
-
 function moveHandler(e) {
-    if (!scribbleEnabled && currentImageIndex !== null && e.which === 1) {
+    if (!scribbleEnabled && currentImageIndex !== null && e.which === 1 && !eraseEnabled) { // Allow image movement only if eraser is not enabled
         let canvasBoundingRectangle = canvas.getBoundingClientRect();
         mouseX = e.clientX - canvasBoundingRectangle.left;
         mouseY = e.clientY - canvasBoundingRectangle.top;
