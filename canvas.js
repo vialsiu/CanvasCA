@@ -15,13 +15,20 @@ let images = [
     // {src: img3, x: 300, y: 300, width: 100, height: 100, rotation: 0, red: 0, green: 0, blue: 0, threshold: false, posterise: false, invert: false, sepia: false, greyscale: false, brightness: 0}
 ];
 
+let lastX = 0;
+let lastY = 0;
+
+let isDrawing = false;
 
 let drawBtn = null;
-// let eraserBtn = null;
-let currentImageIndex = 0;
+let eraserBtn = null;
+let currentImageIndex = null;
 
 let offsetX = 0;
 let offsetY = 0;
+
+let mouseX = 0;
+let mouseY = 0;
 
 let radius = 10;
 let scribbleCanvas = null; 
@@ -30,12 +37,11 @@ let scribbleCanvasCtx = null;
 // let eraserCanvas = null;
 // let eraserCanvasCtx = null;
 let scribbleEnabled = false;
-// let eraseEnabled = false;
+let eraseEnabled = false;
 
 window.onload = onAllAssetsLoaded;
 document.write("<div id='sf_loadingMessage'>Loading...</div>");
 function onAllAssetsLoaded() {
-    // hide the webpage loading message
     document.getElementById('sf_loadingMessage').style.visibility = "hidden";
 
     canvas = document.getElementById("sf_canvas");
@@ -53,16 +59,12 @@ function onAllAssetsLoaded() {
     scribbleCanvas.width = canvas.clientWidth;
     scribbleCanvas.height = canvas.clientHeight;
 
-    // eraserCanvas = document.createElement("canvas");
-    // eraserCanvasCtx = eraserCanvas.getContext("2d");
-    // eraserCanvas.width = canvas.clientWidth;
-    // eraserCanvas.height = canvas.clientHeight;
-
     renderCanvas();
+
     drawBtn = document.getElementById('sf_drawing');
-    // eraserBtn = document.getElementById('sf_erasing');
-    drawBtn.addEventListener("click", enableScribble);
-    // drawBtn.addEventListener("click", eraseScribble);
+    eraserBtn = document.getElementById('sf_erasing');
+    drawBtn.addEventListener("click", toggleScribbling);
+    eraserBtn.addEventListener("click", toggleErasing);
 
     canvas.addEventListener('mousedown', mousedownHandler);
     canvas.addEventListener('mousemove', moveHandler);
@@ -76,11 +78,17 @@ function onAllAssetsLoaded() {
     deleteBtn.addEventListener("click", deleteImage);
     document.getElementById('sf_delete').addEventListener('click', deleteImage);
 
+    canvas.addEventListener('mousedown', startDrawingOrErasing);
+    canvas.addEventListener('mousemove', drawOrErase);
+    canvas.addEventListener('mouseup', stopDrawingOrErasing);
+
     ctx.fillStyle = "darkgray";
     ctx.font = "20px Arial";
     ctx.textAlign = "center"; 
     ctx.textBaseline = "middle";
-    ctx.fillText("INSERT THE IMAGE", canvas.width / 2, canvas.height / 2); // Placing the text at the center
+    ctx.fillText("UPLOAD IMG TO START", canvas.width / 2, canvas.height / 2);
+
+    renderScribbleCanvas();
 }
 
 function renderScribbleCanvas() {
@@ -89,7 +97,6 @@ function renderScribbleCanvas() {
 
 function renderCanvas() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    renderScribbleCanvas(); 
     images.forEach((image, index) => {
         offscreenCanvasCtx.clearRect(0, 0, canvas.width, canvas.height);
         if (index === currentImageIndex) {
@@ -108,6 +115,7 @@ function renderCanvas() {
         offscreenCanvasCtx.restore(); 
         ctx.drawImage(offscreenCanvas, 0, 0, canvas.width, canvas.height);
     });
+    // ctx.drawImage(scribbleCanvas, 0, 0, canvas.width, canvas.height);
     renderScribbleCanvas();
 }
 
@@ -339,47 +347,88 @@ function mouseIsInsideImage(imageTopLeftX, imageTopLeftY, imageWidth, imageHeigh
         renderCanvas();
 }
 
-function enableScribble() {
-    // if (eraseEnabled) 
-    // {
-    //     eraseScribble();
-    //     enableScribble = !enableScribble;
-    // }
-    scribbleEnabled = !scribbleEnabled;
-    if(scribbleEnabled)
-    {
-        canvas.style.cursor = "crosshair"
-        drawBtn.style.backgroundColor = "#5c5c5c";
-        console.log('true')
-    }   
-    else
-    {
-        canvas.style.cursor = "default"
-        drawBtn.style.backgroundColor = "#a5a5a5cd";
-        console.log('drawing')
-    }
-    // renderCanvas();
+function enableScribbling() {
+    scribbleEnabled = true;
+    eraseEnabled = false;
+    canvas.style.cursor = "crosshair";
+    drawBtn.style.backgroundColor = "#5c5c5c";
+    eraserBtn.style.backgroundColor = ""; 
+}
+
+function enableErasing() {
+    eraseEnabled = true;
+    scribbleEnabled = false;
+    canvas.style.cursor = "pointer";
+    drawBtn.style.backgroundColor = "";
+    eraserBtn.style.backgroundColor = "#474646";
 }
 
 
-// function eraseScribble() {
-//     // if (scribbleEnabled) 
-//     // {
-//     //     enableScribble()
-//     //     eraseScribble = !eraseScribble;
-//     // }
-//     scribbleEnabled = !scribbleEnabled;
-//     ctx.clearRect(0, 0, canvas.width, canvas.height);
-//     renderCanvas();
-//     if (eraseEnabled) {
-//         console.log('eraser')
-//         canvas.style.cursor = "pointer";
-//         eraserBtn.style.backgroundColor = "#474646";
-//     } else {
-//         canvas.style.cursor = "default";
-//         eraserBtn.style.backgroundColor = "";
+
+function startDrawingOrErasing(e) {
+    if (scribbleEnabled || eraseEnabled) {
+        isDrawing = true;
+        let canvasBoundingRectangle = canvas.getBoundingClientRect();
+        lastX = e.clientX - canvasBoundingRectangle.left;
+        lastY = e.clientY - canvasBoundingRectangle.top;
+    }
+}
+
+// function startDrawingOrErasing(e) {
+//     if (scribbleEnabled || eraseEnabled) {
+//         isDrawing = true;
+//         let canvasBoundingRectangle = canvas.getBoundingClientRect();
+//         mouseX = e.clientX - canvasBoundingRectangle.left;
+//         mouseY = e.clientY - canvasBoundingRectangle.top;
+//         lastX = mouseX;
+//         lastY = mouseY;
 //     }
 // }
+
+
+function drawOrErase(e) {
+    if ((scribbleEnabled || eraseEnabled) && isDrawing) {
+        let canvasBoundingRectangle = canvas.getBoundingClientRect();
+        mouseX = e.clientX - canvasBoundingRectangle.left;
+        mouseY = e.clientY - canvasBoundingRectangle.top;
+        if (scribbleEnabled) {
+            scribbleCanvasCtx.strokeStyle = scribbleCanvasCtx.fillStyle;
+            scribbleCanvasCtx.beginPath();
+            scribbleCanvasCtx.moveTo(lastX, lastY);
+            scribbleCanvasCtx.lineTo(mouseX, mouseY);
+            scribbleCanvasCtx.stroke();
+            scribbleCanvasCtx.closePath();
+        } else if (eraseEnabled) {
+            scribbleCanvasCtx.clearRect(mouseX - radius / 2, mouseY - radius / 2, radius, radius);
+            renderCanvas();
+        }
+        lastX = mouseX;
+        lastY = mouseY;
+    }
+}
+
+
+    function stopDrawingOrErasing() {
+        isDrawing = false;
+    }
+
+
+    function toggleScribbling() {
+        scribbleEnabled = !scribbleEnabled;
+        eraseEnabled = false; // Ensure erasing is disabled when scribbling is enabled
+        updateButtonStyles();
+    }
+    
+    function toggleErasing() {
+        eraseEnabled = !eraseEnabled;
+        scribbleEnabled = false; // Ensure scribbling is disabled when erasing is enabled
+        updateButtonStyles();
+    }
+
+    function updateButtonStyles() {
+        drawBtn.style.backgroundColor = scribbleEnabled ? "red" : "";
+        eraserBtn.style.backgroundColor = eraseEnabled ? "red" : "";
+    }
 
 function color(newColor) {
     scribbleCanvasCtx.fillStyle = newColor;
