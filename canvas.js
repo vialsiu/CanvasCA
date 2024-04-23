@@ -1,4 +1,3 @@
-let canvas = null;
 let ctx = null;
 
 let offscreenCanvas = null;
@@ -121,43 +120,86 @@ function renderCanvas() {
 
 
 function applyFilters(image, options) {
+    const compositeOperations = {
+        sf_default: 'source-over',
+        sf_sourceatop: 'source-atop',
+        sf_sourcein: 'source-in',
+        sf_sourceout: 'source-out',
+        sf_destinationatop: 'destination-atop',
+        sf_destinationin: 'destination-in',
+        sf_destinationout: 'destination-out',
+        sf_destinationover: 'destination-over',
+        sf_lighter: 'lighter',
+        sf_hue: 'hue',
+        // sf_textMask: 'xor'
+    };
+
     let filteredImageCanvas = document.createElement('canvas');
     let filteredImageCtx = filteredImageCanvas.getContext('2d');
     filteredImageCanvas.width = options.width;
     filteredImageCanvas.height = options.height;
 
-    filteredImageCtx.drawImage(image, 0, 0, options.width, options.height);
+    const centerX = filteredImageCanvas.width / 2;
+    const centerY = filteredImageCanvas.height / 2;
+
+    filteredImageCtx.beginPath();
+    filteredImageCtx.fillStyle = ""; 
+    filteredImageCtx.arc(centerX, centerY, 150, 0, Math.PI * 2);
+    filteredImageCtx.fill();
+    filteredImageCtx.closePath();
+
+    let selectedCompositeOperation = document.getElementById('sf_options').value;
+    let compositeOperation = compositeOperations[selectedCompositeOperation];
+    filteredImageCtx.globalCompositeOperation = compositeOperation;
+
+    filteredImageCtx.drawImage(
+        image, 
+        0, 
+        0, 
+        filteredImageCanvas.width, 
+        filteredImageCanvas.height
+    );
+    
+    if (selectedCompositeOperation === 'sf_lighter' || selectedCompositeOperation === 'sf_hue') {
+        filteredImageCtx.globalCompositeOperation = 'source-over'
+        filteredImageCtx.fillStyle = 'rgba(173, 216, 230, 0.7)';
+        filteredImageCtx.beginPath();
+        filteredImageCtx.arc(centerX, centerY, 150, 0, Math.PI * 2); 
+        filteredImageCtx.fill();
+    }
+
+    filteredImageCtx.globalCompositeOperation = 'source-over';
+
 
     let imageData = filteredImageCtx.getImageData(0, 0, options.width, options.height);
-
     // Apply filters
     for (let i = 0; i < imageData.data.length; i += 4) {
         // Adjust RGB values
-        imageData.data[i + 0] += options.red; // Red
-        imageData.data[i + 1] += options.green; // Green
-        imageData.data[i + 2] += options.blue; // Blue
+        imageData.data[i + 0] += options.red; 
+        imageData.data[i + 1] += options.green; 
+        imageData.data[i + 2] += options.blue; 
 
         // Threshold
         if (options.threshold) {
             let grayscale = (imageData.data[i] + imageData.data[i + 1] + imageData.data[i + 2]) / 3;
             let threshold = grayscale < 128 ? 0 : 255;
-            imageData.data[i] = threshold; // Red
-            imageData.data[i + 1] = threshold; // Green
-            imageData.data[i + 2] = threshold; // Blue
+            imageData.data[i] = threshold;
+            imageData.data[i + 1] = threshold; 
+            imageData.data[i + 2] = threshold; 
         }
 
         // Posterise
         if (options.posterise) {
-            imageData.data[i + 0] -= imageData.data[i + 0] % 64; // Red
-            imageData.data[i + 1] -= imageData.data[i + 1] % 64; // Green
-            imageData.data[i + 2] -= imageData.data[i + 2] % 64; // Blue
+            imageData.data[i + 0] -= imageData.data[i + 0] % 64; 
+            imageData.data[i + 1] -= imageData.data[i + 1] % 64; 
+            imageData.data[i + 2] -= imageData.data[i + 2] % 64; 
         }
 
         // Invert
         if (options.invert) {
-            imageData.data[i + 0] = 255 - imageData.data[i + 0]; // Red
-            imageData.data[i + 1] = 255 - imageData.data[i + 1]; // Green
-            imageData.data[i + 2] = 255 - imageData.data[i + 2]; // Blue
+            imageData.data[i + 0] = 255 - imageData.data[i + 0]; 
+            imageData.data[i + 1] = 255 - imageData.data[i + 1]; 
+            imageData.data[i + 2] = 255 - imageData.data[i + 2];
         }
 
         // Sepia
@@ -165,23 +207,23 @@ function applyFilters(image, options) {
             let red = imageData.data[i];
             let green = imageData.data[i + 1];
             let blue = imageData.data[i + 2];
-            imageData.data[i] = (red * 0.393) + (green * 0.769) + (blue * 0.189); // Red
-            imageData.data[i + 1] = (red * 0.349) + (green * 0.686) + (blue * 0.168); // Green
-            imageData.data[i + 2] = (red * 0.272) + (green * 0.534) + (blue * 0.131); // Blue
+            imageData.data[i] = (red * 0.393) + (green * 0.769) + (blue * 0.189); 
+            imageData.data[i + 1] = (red * 0.349) + (green * 0.686) + (blue * 0.168); 
+            imageData.data[i + 2] = (red * 0.272) + (green * 0.534) + (blue * 0.131); 
         }
 
         // Greyscale
         if (options.greyscale) {
             let grayscale = (imageData.data[i] + imageData.data[i + 1] + imageData.data[i + 2]) / 3;
-            imageData.data[i] = grayscale; // Red
-            imageData.data[i + 1] = grayscale; // Green
-            imageData.data[i + 2] = grayscale; // Blue
+            imageData.data[i] = grayscale; 
+            imageData.data[i + 1] = grayscale; 
+            imageData.data[i + 2] = grayscale; 
         }
 
         // Adjust brightness
-        imageData.data[i + 0] += options.brightness; // Red
-        imageData.data[i + 1] += options.brightness; // Green
-        imageData.data[i + 2] += options.brightness; // Blue
+        imageData.data[i + 0] += options.brightness; 
+        imageData.data[i + 1] += options.brightness; 
+        imageData.data[i + 2] += options.brightness; 
     }
 
     filteredImageCtx.putImageData(imageData, 0, 0);
@@ -416,13 +458,13 @@ function drawOrErase(e) {
 
     function toggleScribbling() {
         scribbleEnabled = !scribbleEnabled;
-        eraseEnabled = false; // Ensure erasing is disabled when scribbling is enabled
+        eraseEnabled = false; 
         updateButtonStyles();
     }
     
     function toggleErasing() {
         eraseEnabled = !eraseEnabled;
-        scribbleEnabled = false; // Ensure scribbling is disabled when erasing is enabled
+        scribbleEnabled = false; 
         updateButtonStyles();
     }
 
@@ -444,10 +486,46 @@ Math.radians = function (degrees) {
 }
 
 //-------text
-function enterText()
-{
-let text = prompt("Enter text here");
+function renderTexts() {
+    texts.forEach((text) => {
+        ctx.font = text.font;
+        ctx.fillStyle = text.color;
+        ctx.textAlign = text.align;
+        ctx.textBaseline = text.baseline;
+        ctx.fillText(text.content, text.x, text.y);
+    });
+}
 
+function addText(content, font, color, align, baseline, x, y) {
+    let newText = {
+        content: content,
+        font: font,
+        color: color,
+        align: align,
+        baseline: baseline,
+        x: x,
+        y: y
+    };
+    texts.push(newText);
+    renderCanvas();
+}
+
+function deleteText(index) {
+    texts.splice(index, 1);
+    renderCanvas();
+}
+
+function enterText() {
+    let content = prompt("Enter text here");
+    if (content) {
+        let font = "30px Arial";
+        let color = "black";
+        let align = "center";
+        let baseline = "middle";
+        let x = canvas.width / 2;
+        let y = canvas.height / 2;
+        addText(content, font, color, align, baseline, x, y);
+    }
 }
 
 //---------save

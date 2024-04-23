@@ -30,7 +30,7 @@ textarea {
     align-self:center;
     justify-content:center;
     height:5vh;
-    width:16.6vw;
+    width:16.4vw;
     box-shadow: 0px 4px 8px rgba(64, 63, 63, 0.4);
     box-shadow: 0px 0px 10px 2px rgba(0, 0, 0, 0.197);
     padding:0;
@@ -79,7 +79,7 @@ textarea {
     margin-right:0.5vw;
     text-align: center;
     margin-top:3vh;
-    max-width:vw;
+    max-width:16.6vw;
 
 }
 
@@ -117,15 +117,14 @@ font-weight:400;
     height: 2.2em;
     width: 2.2em;
     background-color: #a5a5a5cd;
-    padding: 0.5em;
-    margin-bottom:1vh;
-    margin-left:0.1em;
-    margin-right:0.1em;
+    padding: 0.45em;
+    margin-bottom:0.8vh;
+    margin-left:0.05em;
+    margin-right:0.05em;
     border-radius: 0.2em;
     box-shadow: 2px 2px 4px rgba(5, 5, 5, 0.5);
     transition: background-color 0.25s;
 }
-
 
 
 .sf_buttons:hover, .sf_buttons2:hover{
@@ -224,7 +223,7 @@ font-weight:400;
 {
  display:flex;
  align-items:center;
- width:auto;
+ width:16vw;
  height:5vh;
  background-color:rgb(85, 85, 85);
  border-radius: 0.2em;
@@ -270,6 +269,16 @@ sf_textScale{
     accent-color:#b8bebb;
 }
 
+.sf_filterholder{
+    border-radius:0.5vw;
+    background-color:rgba(21, 21, 21, 0.269);
+    padding-top:0.5vw;
+    padding-bottom:0.2vw;
+    margin-bottom:1vh;
+    padding-left:0.16vw;
+    padding-right:0.16vw;
+}
+
 .sf_rangedial
 {
     margin-left:0.9vw;
@@ -285,14 +294,85 @@ sf_textScale{
 
 
   .sf_filterholder{
-    display:flex;
-    margin-left:2.9vw;
     margin-right:0.28vw;
     text-align: center;
     margin-top:1vh;
     align-items:center;
     flex-wrap:nowrap;
     justify-content:center;
-    max-width:10vw;
   }
 
+  @media (max-width: 1200px) {
+    body {
+    }
+    .sf_buttonholder
+    {
+        flex-direction:row;
+        width: 100vw; 
+        justify-content: space-between;
+    }
+    
+    #sf_canvas
+    {
+        width:590px;
+        height:590px;
+    }
+}
+
+@media (max-width: 1060px) {
+    body {
+        /* background-color:#b8e6c6; */
+    }
+    
+    #sf_canvas
+    {
+        width:570px;
+        height:570px;
+    }
+
+    #sf_centercanvas{
+        margin-top:8vh;
+    }
+}
+
+@media (max-width: 1040px) {
+    body {
+        /* background-color:#a5679b; */
+    }
+    
+    #sf_canvas
+    {
+        width:540px;
+        height:540px;
+    }
+
+    #sf_centercanvas{
+        margin-top:10vh;
+    }
+}
+@media (max-width: 1000px) {
+    body {
+        /* background-color:#67a5a0; */
+    }
+    
+    #sf_centercanvas{
+        margin-top:10vh;
+    }
+
+    #sf_canvas
+    {
+        width:520px;
+        height:520px;
+    }
+}
+
+#sf_options{
+    width:16.6vw;
+    border:none;
+    background-color:#232323;
+    color:rgb(187, 187, 187);
+    font-size:1vw;
+    height:2vw;
+    padding-left:2%;
+    font-weight:600;
+}

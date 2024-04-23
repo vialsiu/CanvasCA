@@ -30,11 +30,16 @@
                 <div class="sf_rangeholder" id="sf_rotation"><img class="sf_rangedial" src="rotate.png" alt="hi"><input type="range" value="0" min="0" max="360" onchange="setRotationDegrees(this.value)"/></div>
                 <div class="sf_rangeholder" id="sf_bright"><img class="sf_rangedial" src="brightness.png" alt="hi"><input type="range" id="sf_brightness" value="0" min="-255" max="255" onchange = "setBrightness(this.value)"/></div>
                 <div class="sf_filterholder">
-                    <img class="sf_buttons2" id="sf_greyscale" onclick="toggleGreyscale(!images[currentImageIndex].greyscale)" alt="greyscale" src="greyscale.png">
-                    <img class="sf_buttons2" id="sf_sepia" onclick="toggleSepia(!images[currentImageIndex].sepia)" src="sepia.png" alt="sepia">
-                    <img class="sf_buttons2" id="sf_invert" onclick="toggleInvert(!images[currentImageIndex].invert)" src="invert.png" alt="invert">
-                    <img class="sf_buttons2" id="sf_posterise" onclick="togglePosterise(!images[currentImageIndex].posterise)" src="pixelate.png" alt="posterise">
-                    <img class="sf_buttons2" id="sf_threshold" onclick="toggleThreshold(!images[currentImageIndex].treshold)" alt="threshold" src="threshold.png">
+                    <img class="sf_buttons2" id="sf_greyscale" title="Greyscale" onclick="toggleGreyscale(!images[currentImageIndex].greyscale)" alt="greyscale" src="greyscale.png">
+                    <img class="sf_buttons2" id="sf_sepia" title="Sepia" onclick="toggleSepia(!images[currentImageIndex].sepia)" src="sepia.png" alt="sepia">
+                    <img class="sf_buttons2" id="sf_invert" title="Invert" onclick="toggleInvert(!images[currentImageIndex].invert)" src="invert.png" alt="invert">
+                    <img class="sf_buttons2" id="sf_posterise" title="Posterise" onclick="togglePosterise(!images[currentImageIndex].posterise)" src="pixelate.png" alt="posterise">
+                    <img class="sf_buttons2" id="sf_threshold" title="Threshold" onclick="toggleThreshold(!images[currentImageIndex].treshold)" alt="threshold" src="threshold.png">
+                    <!-- <img class="sf_buttons2" id="sf_circular" title="Circular" onclick="" alt="globalComposite circle" src="reccircle.png">
+                    <img class="sf_buttons2" id="sf_textMask" title="Text Mask" onclick="" src="textMask.png" alt="text mask">
+                    <img class="sf_buttons2" id="sf_colorburn" title="Color burn" onclick="" src="colorburn.png" alt="colorburn">
+                    <img class="sf_buttons2" id="sf_colordodge" title="Color dodge" onclick="" src="colordodge.png" alt="posterise">
+                    <img class="sf_buttons2" id="sf_overlay" title="Overlay" onclick="" src="overlay.png" alt="overlay"> -->
                     </div>
                     <div class="sf_rangeholder" id="sf_redrange"><img class="sf_rangedial" src="rgb.png" alt="hi"><input type="range" id="sf_red" value="0" min="-255" max="255" onchange="setRGB(this.value, 'red')"/></div>
                     <div class="sf_rangeholder" id="sf_greenrange"><img class="sf_rangedial" src="rgb.png" alt="hi"><input type="range" id="sf_green" value="0" min="-255" max="255" onchange="setRGB(this.value, 'green')"/></div>
@@ -45,6 +50,7 @@
         <div id="sf_centercanvas">
         <canvas id="sf_canvas"></canvas>
         </div>
+
         <div class="sf_toolbox">
                 <div class="sf_buttonholder2">
                 <img class="sf_buttons" id="sf_insert" src="picture.png" title="Insert Image" alt="Insert Image">
@@ -57,6 +63,19 @@
                 <img class="sf_buttons" id="sf_delete" src="trash.png" title="Duplicate" alt="Duplicate">
                 <input type="color" onchange="color(this.value)" id="sf_colorpicker" value="#000000" title="Colorpicker">
                 <div class="sf_rangeholder" id="sf_brushScaling"> <img class="sf_rangedial" src="paintroller.png" alt="brush scaling"><input type="range" id="sf_brushScale" min="1" max="100" value="10" onchange="radiusSize(this.value)"></div>
+                <select id="sf_options">
+                    <option value="sf_default">No Mask</option>
+                    <option value="sf_sourceatop">Source-Atop</option>
+                    <option value="sf_sourcein">Source-In</option>
+                    <option value="sf_sourceout">Source-Out</option>
+                    <option value="sf_destinationatop">Destination-Atop</option>
+                    <option value="sf_destinationin">Destination-In</option>
+                    <option value="sf_destinationout">Destination-Out</option>
+                    <option value="sf_destinationover">Destination-Over</option>
+                    <option value="sf_lighter">Lighter</option>
+                    <option value="sf_hue">Hue</option>
+                    <option value="sf_textMask">Text Mask</option>
+                  </select>
             </div>
         </div>
     </body>
