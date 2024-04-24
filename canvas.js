@@ -271,19 +271,26 @@ function mousedownHandler(e) {
         mouseX = e.clientX - canvasBoundingRectangle.left;
         mouseY = e.clientY - canvasBoundingRectangle.top;
         let clickedInsideImage = false;
+        
         for (let i = images.length - 1; i > -1; i--) {
             if (mouseIsInsideImage(images[i].x, images[i].y, images[i].width, images[i].height, mouseX, mouseY)) {
                 if (!eraseEnabled) { 
                     canvas.style.cursor = "pointer";
                     offsetX = mouseX - images[i].x;
                     offsetY = mouseY - images[i].y;
-                    currentImageIndex = i;
+
+                    const clickedImage = images[i];
+                    images.splice(i, 1);  
+                    images.push(clickedImage);
+
+                    currentImageIndex = images.length - 1; 
                     clickedInsideImage = true;
-                    renderCanvas();
+                    renderCanvas();  
                     break;
                 }
             }
         }
+
         if (!clickedInsideImage && !eraseEnabled) { 
             canvas.style.cursor = "default";
             currentImageIndex = null;
@@ -291,6 +298,7 @@ function mousedownHandler(e) {
         }
     }
 }
+
 
 function moveHandler(e) {
     if (!scribbleEnabled && currentImageIndex !== null && e.which === 1 && !eraseEnabled) { // Allow image movement only if eraser is not enabled
