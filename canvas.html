@@ -26,9 +26,9 @@
 
         <div class="sf_pulloutmenu">
             <div class="sf_buttonholder">
-                <div class="sf_rangeholder" id="sf_textRotate"><img class="sf_rangedial" src="rotation.png" alt="hi"><input type="range" id="sf_textrotate" onchange="setTextDegrees(this.value)" value="0" min="-255" max="255"/></div>
-                <div class="sf_rangeholder" id="sf_rotation"><img class="sf_rangedial" src="rotate.png" alt="hi"><input type="range" value="0" min="0" max="360" onchange="setRotationDegrees(this.value)"/></div>
-                <div class="sf_rangeholder" id="sf_bright"><img class="sf_rangedial" src="brightness.png" alt="hi"><input type="range" id="sf_brightness" value="0" min="-255" max="255" onchange = "setBrightness(this.value)"/></div>
+                <div class="sf_rangeholder" id="sf_textRotate"><img class="sf_rangedial" src="rotation.png" alt="textrotation"><input type="range" id="sf_textrotate" onchange="setTextDegrees(this.value)" value="0" title="rotate text" min="-255" max="255"/></div>
+                <div class="sf_rangeholder" id="sf_rotation"><img class="sf_rangedial" src="rotate.png" alt="imagerotation"><input type="range" value="0" min="0" max="360" onchange="setRotationDegrees(this.value)" title="rotate image"/></div>
+                <div class="sf_rangeholder" id="sf_bright"><img class="sf_rangedial" src="brightness.png" alt="brightnessrotation"><input type="range" id="sf_brightness" value="0" min="-255" max="255" onchange = "setBrightness(this.value)"/></div>
                 <div class="sf_filterholder">
                     <img class="sf_buttons2" id="sf_greyscale" title="Greyscale" onclick="toggleGreyscale(!images[currentImageIndex].greyscale)" alt="greyscale" src="greyscale.png">
                     <img class="sf_buttons2" id="sf_sepia" title="Sepia" onclick="toggleSepia(!images[currentImageIndex].sepia)" src="sepia.png" alt="sepia">
@@ -41,9 +41,9 @@
                     <img class="sf_buttons2" id="sf_colordodge" title="Color dodge" onclick="" src="colordodge.png" alt="posterise">
                     <img class="sf_buttons2" id="sf_overlay" title="Overlay" onclick="" src="overlay.png" alt="overlay"> -->
                     </div>
-                    <div class="sf_rangeholder" id="sf_redrange"><img class="sf_rangedial" src="rgb.png" alt="hi"><input type="range" id="sf_red" value="0" min="-255" max="255" onchange="setRGB(this.value, 'red')"/></div>
-                    <div class="sf_rangeholder" id="sf_greenrange"><img class="sf_rangedial" src="rgb.png" alt="hi"><input type="range" id="sf_green" value="0" min="-255" max="255" onchange="setRGB(this.value, 'green')"/></div>
-                    <div class="sf_rangeholder" id="sf_bluerange"><img class="sf_rangedial" src="rgb.png" alt="hi"><input type="range" id="sf_blue" value="0" min="-255" max="255" onchange="setRGB(this.value, 'blue')"/></div>
+                    <div class="sf_rangeholder" id="sf_redrange"><img class="sf_rangedial" src="rgb.png" alt="red"><input type="range" id="sf_red" value="0" min="-255" max="255" onchange="setRGB(this.value, 'red')"/></div>
+                    <div class="sf_rangeholder" id="sf_greenrange"><img class="sf_rangedial" src="rgb.png" alt="green"><input type="range" id="sf_green" value="0" min="-255" max="255" onchange="setRGB(this.value, 'green')"/></div>
+                    <div class="sf_rangeholder" id="sf_bluerange"><img class="sf_rangedial" src="rgb.png" alt="blue"><input type="range" id="sf_blue" value="0" min="-255" max="255" onchange="setRGB(this.value, 'blue')"/></div>
                 </div>
         </div>
 
@@ -61,8 +61,18 @@
                 <img class="sf_buttons" onclick="enterText()" id="textInput" placeholder="Enter text here" src="font.png" alt="Add Text" title="Add Text">
                 <img class="sf_buttons" id="sf_save" onclick="saveCanvas()" src="diskette.png" title="Save" alt="Save">
                 <img class="sf_buttons" id="sf_delete" src="trash.png" title="Delete" alt="Duplicate" >
-                <input type="color" onchange="color(this.value)" id="sf_colorpicker" value="#000000" title="Colorpicker">
-                <div class="sf_rangeholder" id="sf_brushScaling"> <img class="sf_rangedial" src="paintroller.png" alt="brush scaling"><input type="range" id="sf_brushScale" min="1" max="100" value="10" onchange="radiusSize(this.value)"></div>
+                <div class="sf_rangeholder" id="sf_brushScaling"> 
+                    <img class="sf_rangedial" src="paintroller.png" alt="brush scaling">
+                    <input type="range" id="sf_brushScale" min="1" max="100" value="10" onchange="radiusSize(this.value)">
+                </div>
+                <div class="sf_labels">
+                    <input type="color" onchange="color(this.value)" id="sf_colorpicker" value="#000000" title="Colorpicker">
+                    <div class="sf_label">draw.</div>
+                </div>
+                <div class="sf_labels">
+                    <input type="color" onchange="colorText(this.value)" id="sf_colorpicker2" value="#000000" title="Colorpicker">
+                    <div class="sf_label">text.</div>
+                </div>
                 <select id="sf_options">
                     <option value="sf_default">No Mask</option>
                     <option value="sf_sourceatop">Source-Atop</option>

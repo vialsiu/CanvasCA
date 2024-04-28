@@ -640,8 +640,8 @@ function drawOrErase(e) {
     }
 
     function updateButtonStyles() {
-        drawBtn.style.backgroundColor = scribbleEnabled ? "red" : "";
-        eraserBtn.style.backgroundColor = eraseEnabled ? "red" : "";
+        drawBtn.style.backgroundColor = scribbleEnabled ? "silver" : "";
+        eraserBtn.style.backgroundColor = eraseEnabled ? "lavender" : "";
     }
 
 function color(newColor) {
@@ -650,9 +650,7 @@ function color(newColor) {
     console.log("new color")
 }
 function colorText(newColor){
-    textCanvasCtx.fillStyle = newColor;
-    console.log("new color for text");
-    console.log("new colour")
+    texts[currentTextIndex].color = newColor; 
 }
 
 

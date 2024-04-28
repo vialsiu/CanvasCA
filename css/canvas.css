@@ -24,20 +24,41 @@ textarea {
 
 
 
-#sf_colorpicker{
-    display:flex;
-    justify-self: center;
-    align-self:center;
-    justify-content:center;
-    height:5vh;
-    width:16.4vw;
-    box-shadow: 0px 4px 8px rgba(64, 63, 63, 0.4);
-    box-shadow: 0px 0px 10px 2px rgba(0, 0, 0, 0.197);
-    padding:0;
-    margin-right:15.2px;
-    margin-left:2px;
-    margin-bottom:1.5vh;
-}
+  #sf_colorpicker,
+  #sf_colorpicker2 {
+      display: flex;
+      justify-self: center;
+      align-self: center;
+      justify-content: center;
+      height: 5vh;
+      width: 16.4vw;
+      box-shadow: 0px 4px 8px rgba(64, 63, 63, 0.4);
+      box-shadow: 0px 0px 10px 2px rgba(0, 0, 0, 0.197);
+      padding: 0;
+      margin-right: 15.2px;
+      margin-left: 2px;
+      margin-bottom: 1.5vh;
+  }
+  
+  #sf_colorpicker + .sf_label,
+  #sf_colorpicker2 + .sf_label {
+    font-size:1.5em;
+    font-family: "League Spartan", sans-serif;
+    text-transform: lowercase;
+    font-optical-sizing: auto;
+    font-weight: 700;
+    font-style:normal;      
+    position: absolute;
+      top: 50%; 
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: rgb(61, 61, 61);
+      pointer-events: none; 
+  }
+  
+  .sf_labels{
+    position: relative;
+  }
 
 #sf_colorpicker:hover{
     cursor:pointer;
