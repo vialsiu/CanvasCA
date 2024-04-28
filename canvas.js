@@ -201,8 +201,24 @@ function applyFilters(image, options) {
         sf_destinationover: 'destination-over',
         sf_lighter: 'lighter',
         sf_hue: 'hue',
-        // sf_textMask: 'xor'
     };
+
+    // const convolutionOptions = {
+    //     sf_default: [0, 0, 0, 0, 1, 0, 0, 0, 0],
+    //     sf_emboss: [0, 0, 0, 0, 2, -1, 0, -1, 0],
+    //     sf_blur: [1, 2, 1, 2, 4, 2, 1, 2, 1],
+    //     sf_sharpen: [0, -2, 0, -2, 11, -2, 0, -2, 0],
+    //     sf_edgedetection: [1, 1, 1, 1, -7, 1, 1, 1, 1]
+    // };
+
+    // convolutions did WORK but be careful I had to comment them out
+    // as they kept lagging my computer too much to use my website
+
+    // let selectedCompositeOperation = document.getElementById('sf_options').value;
+    // let compositeOperation = compositeOperations[selectedCompositeOperation];
+
+    // let selectedConvolution = document.getElementById('sf_options2').value;
+    // let convolutionMatrix = convolutionOptions[selectedConvolution];
 
     let filteredImageCanvas = document.createElement('canvas');
     let filteredImageCtx = filteredImageCanvas.getContext('2d');
@@ -239,7 +255,7 @@ function applyFilters(image, options) {
     }
 
     filteredImageCtx.globalCompositeOperation = 'source-over';
-
+    //i didnt like the convolutions thing i took everything out it was incorporated in my filters
 
     let imageData = filteredImageCtx.getImageData(0, 0, options.width, options.height);
     // Apply filters
@@ -301,6 +317,49 @@ function applyFilters(image, options) {
     return filteredImageCanvas;
 }
 
+function maskTextWithFixedImage() { //doesn't really work but i tried 
+    const fixedImageSrc = 'wony.jpg'; 
+    
+    const image = new Image();
+    image.src = fixedImageSrc;
+    
+    image.onload = function() { 
+        if (currentTextIndex !== null) {
+            const text = texts[currentTextIndex];
+            
+            const maskCanvas = document.createElement('canvas');
+            const maskCtx = maskCanvas.getContext('2d');
+            maskCanvas.width = canvas.width;
+            maskCanvas.height = canvas.height;
+
+            maskCtx.font = text.font;
+            maskCtx.textAlign = text.align;
+            maskCtx.textBaseline = text.baseline;
+            maskCtx.fillStyle = text.color;
+            maskCtx.translate(text.x, text.y);
+            maskCtx.rotate(Math.radians(text.rotation || 0));
+            maskCtx.fillText(text.content, 0, 0);
+
+            maskCtx.globalCompositeOperation = 'source-in';
+            maskCtx.drawImage(image, 0, 0, maskCanvas.width, maskCanvas.height);
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height); 
+            ctx.drawImage(maskCanvas, 0, 0, canvas.width, canvas.height);
+            
+            ctx.globalCompositeOperation = 'source-over'; 
+        }
+    };
+}
+
+
+
+
+function optionChanged(selectedOption) {
+    if (selectedOption === "sf_textMask") {
+        maskTextWithImage();
+    }
+}
+
 
 //(Aesthetic purposes) Update toolbar background = colorpicker,
 // EXCEPT the light pink colour at defaut (default) or white
@@ -337,14 +396,14 @@ window.addEventListener('DOMContentLoaded', function () {
 function mousedownHandler(e) {
     if (e.which === 1) { 
         let canvasBoundingRectangle = canvas.getBoundingClientRect();
-        let mouseX = e.clientX - canvasBoundingRectangle.left;
-        let mouseY = e.clientY - canvasBoundingRectangle.top;
+        mouseX = e.clientX - canvasBoundingRectangle.left;
+        mouseY = e.clientY - canvasBoundingRectangle.top;
 
         let clickedInsideText = false;
         for (let i = texts.length - 1; i >= 0; i--) {
             let text = texts[i];
-            let textWidth = ctx.measureText(text.content).width;
-            let textHeight = parseInt(text.font);
+            let textWidth = textCanvasCtx.measureText(text.content).width * text.scale;
+            let textHeight = parseInt(text.font) * text.scale;
 
             if (
                 mouseX >= text.x - textWidth / 2 &&
@@ -354,23 +413,43 @@ function mousedownHandler(e) {
             ) {
                 offsetX = mouseX - text.x;
                 offsetY = mouseY - text.y;
-
-                const clickedText = texts.splice(i, 1)[0]; 
-                texts.push(clickedText); 
-
-                currentTextIndex = texts.length - 1; 
+                currentTextIndex = i;
+                currentImageIndex = null; 
                 clickedInsideText = true;
                 break;
             }
         }
 
         if (!clickedInsideText) {
-            currentTextIndex = null; 
+            let clickedInsideImage = false;
+
+            for (let i = images.length - 1; i >= 0; i--) {
+                let image = images[i];
+                if (
+                    mouseX >= image.x &&
+                    mouseX <= image.x + image.width &&
+                    mouseY >= image.y &&
+                    mouseY <= image.y + image.height
+                ) {
+                    offsetX = mouseX - image.x;
+                    offsetY = mouseY - image.y;
+                    currentImageIndex = i;
+                    currentTextIndex = null; 
+                    clickedInsideImage = true;
+                    break;
+                }
+            }
+
+            if (!clickedInsideImage) {
+                currentImageIndex = null;
+            }
         }
 
-        renderCanvas();
+        renderCanvas(); 
     }
 }
+
+
 
 
 
