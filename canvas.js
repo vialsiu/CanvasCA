@@ -653,6 +653,10 @@ function colorText(newColor){
     texts[currentTextIndex].color = newColor; 
 }
 
+function changeFont(selectedFont) {
+        texts[currentTextIndex].font = `40px ${selectedFont}`;
+        renderCanvas();
+}
 
 function radiusSize(newRadiusSize) {
     radius = newRadiusSize;

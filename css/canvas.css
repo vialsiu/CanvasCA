@@ -398,7 +398,7 @@ sf_textrotate{
     font-weight:600;
 }
 
-#sf_options2{
+#sf_options2, #sf_options3{
     margin-top:1vh;
     width:16.6vw;
     border:none;
