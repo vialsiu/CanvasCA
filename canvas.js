@@ -394,61 +394,41 @@ window.addEventListener('DOMContentLoaded', function () {
 });
 
 function mousedownHandler(e) {
-    if (e.which === 1) { 
-        let canvasBoundingRectangle = canvas.getBoundingClientRect();
-        mouseX = e.clientX - canvasBoundingRectangle.left;
-        mouseY = e.clientY - canvasBoundingRectangle.top;
+    if (e.which === 1) {
+        let canvasBounds = canvas.getBoundingClientRect();
+        mouseX = e.clientX - canvasBounds.left;
+        mouseY = e.clientY - canvasBounds.top;
 
-        let clickedInsideText = false;
+        let foundText = false;
         for (let i = texts.length - 1; i >= 0; i--) {
             let text = texts[i];
             let textWidth = textCanvasCtx.measureText(text.content).width * text.scale;
             let textHeight = parseInt(text.font) * text.scale;
 
-            if (
-                mouseX >= text.x - textWidth / 2 &&
-                mouseX <= text.x + textWidth / 2 &&
-                mouseY >= text.y - textHeight / 2 &&
-                mouseY <= text.y + textHeight / 2
-            ) {
+            let withinX = (mouseX >= text.x - textWidth / 2) && (mouseX <= text.x + textWidth / 2);
+            let withinY = (mouseY >= text.y - textHeight / 2) && (mouseY <= text.y + textHeight / 2);
+
+            if (withinX && withinY) {
+                let selectedText = texts.splice(i, 1)[0];
+                texts.push(selectedText);
+
                 offsetX = mouseX - text.x;
                 offsetY = mouseY - text.y;
-                currentTextIndex = i;
-                currentImageIndex = null; 
-                clickedInsideText = true;
+                currentTextIndex = texts.length - 1;
+                currentImageIndex = null;
+                foundText = true;
                 break;
             }
         }
 
-        if (!clickedInsideText) {
-            let clickedInsideImage = false;
-
-            for (let i = images.length - 1; i >= 0; i--) {
-                let image = images[i];
-                if (
-                    mouseX >= image.x &&
-                    mouseX <= image.x + image.width &&
-                    mouseY >= image.y &&
-                    mouseY <= image.y + image.height
-                ) {
-                    offsetX = mouseX - image.x;
-                    offsetY = mouseY - image.y;
-                    currentImageIndex = i;
-                    currentTextIndex = null; 
-                    clickedInsideImage = true;
-                    break;
-                }
-            }
-
-            if (!clickedInsideImage) {
-                currentImageIndex = null;
-            }
+        if (!foundText) {
+            currentTextIndex = null;
+            currentImageIndex = null;
         }
 
-        renderCanvas(); 
+        renderCanvas();
     }
 }
-
 
 
 
