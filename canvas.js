@@ -354,53 +354,24 @@ function mousedownHandler(e) {
             ) {
                 offsetX = mouseX - text.x;
                 offsetY = mouseY - text.y;
-                currentTextIndex = i;
+
+                const clickedText = texts.splice(i, 1)[0]; 
+                texts.push(clickedText); 
+
+                currentTextIndex = texts.length - 1; 
                 clickedInsideText = true;
                 break;
             }
         }
 
         if (!clickedInsideText) {
-            let clickedInsideImage = false;
-
-            for (let i = images.length - 1; i >= 0; i--) {
-                if (
-                    mouseIsInsideImage(
-                        images[i].x,
-                        images[i].y,
-                        images[i].width,
-                        images[i].height,
-                        mouseX,
-                        mouseY
-                    )
-                ) {
-                    offsetX = mouseX - images[i].x;
-                    offsetY = mouseY - images[i].y;
-
-                    const clickedImage = images[i];
-                    images.splice(i, 1); 
-                    images.push(clickedImage);
-
-                    currentImageIndex = images.length - 1; 
-                    clickedInsideImage = true;
-                    break;
-                }
-            }
-
-            if (!clickedInsideImage) {
-                currentImageIndex = null; 
-            }
-        }
-
-        if (clickedInsideText) {
-            currentImageIndex = null; 
-        } else {
             currentTextIndex = null; 
         }
 
-        renderCanvas(); 
+        renderCanvas();
     }
 }
+
 
 
 
