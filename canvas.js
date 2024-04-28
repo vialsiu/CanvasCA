@@ -126,9 +126,11 @@ function renderScribbleCanvas() {
 
 function renderTextCanvas() {
     textCanvasCtx.clearRect(0, 0, textCanvas.width, textCanvas.height);
+
     texts.forEach((text, index) => {
         textCanvasCtx.save(); 
         textCanvasCtx.translate(text.x, text.y);
+        textCanvasCtx.scale(text.scale, text.scale);
         textCanvasCtx.rotate(Math.radians(text.rotation || 0));
 
         textCanvasCtx.font = text.font;
@@ -137,7 +139,7 @@ function renderTextCanvas() {
         textCanvasCtx.textBaseline = text.baseline;
 
         let textWidth = textCanvasCtx.measureText(text.content).width;
-        let textHeight = parseInt(text.font); 
+        let textHeight = parseInt(text.font);
 
         if (index === currentTextIndex) {
             textCanvasCtx.strokeStyle = "grey"; 
@@ -150,12 +152,14 @@ function renderTextCanvas() {
             ); 
         }
 
-        textCanvasCtx.fillText(text.content, 0, 0);
-        textCanvasCtx.restore();
+        textCanvasCtx.fillText(text.content, 0, 0); 
+        textCanvasCtx.restore(); 
     });
 
     ctx.drawImage(textCanvas, 0, 0, canvas.width, canvas.height);
 }
+
+
 
 
 
@@ -433,43 +437,45 @@ function moveHandler(e) {
     }
 }
 
-//---------scaling img
+//---------scaling img + TEXT
 function mousewheelHandler(e) {
-    if (currentImageIndex !== null) {
-        let canvasBoundingRectangle = canvas.getBoundingClientRect();
-        mouseX = e.clientX - canvasBoundingRectangle.left;
-        mouseY = e.clientY - canvasBoundingRectangle.top;
-        let oldWidth = images[currentImageIndex].width;
-        let oldHeight = images[currentImageIndex].height;
-        let scaleFactor = 1 - e.deltaY / 1200;
-        let oldCentreX = images[currentImageIndex].x + oldWidth / 2;
-        let oldCentreY = images[currentImageIndex].y + oldHeight / 2;
-        images[currentImageIndex].width *= scaleFactor;
-        images[currentImageIndex].height *= scaleFactor;
-        let newWidth = images[currentImageIndex].width;
-        let newHeight = images[currentImageIndex].height;
-        images[currentImageIndex].x = oldCentreX - newWidth / 2;
-        images[currentImageIndex].y = oldCentreY - newHeight / 2;
-        renderCanvas();
-        }
-        if (currentTextIndex !== null) {
-            let canvasBoundingRectangle = canvas.getBoundingClientRect();
-            mouseX = e.clientX - canvasBoundingRectangle.left;
-            mouseY = e.clientY - canvasBoundingRectangle.top;
-            let oldWidth = texts[currentTextIndex].width;
-            let oldHeight = texts[currentTextIndex].height;
-            let scaleFactor = 1 - e.deltaY / 1200;
-            let oldCentreX = texts[currentTextIndex].x + oldWidth / 2;
-            let oldCentreY = texts[currentTextIndex].y + oldHeight / 2;
-            texts[currentTextIndex].width *= scaleFactor;
-            texts[currentTextIndex].height *= scaleFactor;
-            let newWidth = texts[currentTextIndex].width;
-            let newHeight = texts[currentTextIndex].height;
-            texts[currentTextIndex].x = oldCentreX - newWidth / 2;
-            texts[currentTextIndex].y = oldCentreY - newHeight / 2;
-            renderCanvas();
-            }
+    let scaleFactor = 1 - e.deltaY / 1200;
+
+    if (currentTextIndex !== null) {
+        let currentText = texts[currentTextIndex];
+
+        currentText.scale *= scaleFactor;
+
+        let textWidth = textCanvasCtx.measureText(currentText.content).width * currentText.scale;
+        let textHeight = parseInt(currentText.font) * currentText.scale;
+        
+        let offsetX = (textWidth * (1 - scaleFactor)) / 2;
+        let offsetY = (textHeight * (1 - scaleFactor)) / 2;
+        
+        currentText.x -= offsetX;
+        currentText.y -= offsetY;
+
+        renderCanvas(); 
     }
+
+    if (currentImageIndex !== null) {
+        let currentImage = images[currentImageIndex];
+        let oldWidth = currentImage.width;
+        let oldHeight = currentImage.height;
+
+        currentImage.width *= scaleFactor;
+        currentImage.height *= scaleFactor;
+
+        let oldCentreX = currentImage.x + oldWidth / 2;
+        let oldCentreY = currentImage.y + oldHeight / 2;
+
+        currentImage.x = oldCentreX - currentImage.width / 2;
+        currentImage.y = oldCentreY - currentImage.height / 2;
+
+        renderCanvas();
+    }
+}
+
 
 
 //-------am i touching the img
@@ -666,7 +672,9 @@ function addText(content, font, colorText, align, baseline, x, y) {
         align: align,
         baseline: baseline,
         x: x,
-        y: y
+        y: y,
+        rotation: 0, 
+        scale: 1 
     };
     texts.push(newText);
     renderCanvas();
