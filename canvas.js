@@ -109,11 +109,11 @@ function onAllAssetsLoaded() {
     canvas.addEventListener('mousemove', drawOrErase);
     canvas.addEventListener('mouseup', stopDrawingOrErasing);
 
-    ctx.fillStyle = "darkgray";
-    ctx.font = "20px Arial";
-    ctx.textAlign = "center"; 
-    ctx.textBaseline = "middle";
-    ctx.fillText("Please upload an image", canvas.width / 2, canvas.height / 2);
+    // ctx.fillStyle = "darkgray";
+    // ctx.font = "20px Arial";
+    // ctx.textAlign = "center"; 
+    // ctx.textBaseline = "middle";
+    // ctx.fillText("Please upload an image", canvas.width / 2, canvas.height / 2);
 
     renderTextCanvas();
     renderScribbleCanvas();
