@@ -1,5 +1,4 @@
 let ctx = null;
-
 let offscreenCanvas = null;
 let offscreenCanvasCtx = null;
 
@@ -9,19 +8,41 @@ let imageX = 250;
 let imageY = 250;
 
 let images = [
-    // {src: img1, x: 100, y: 100, width: 100, height: 100, rotation: 0, red: 0, green: 0, blue: 0, threshold: false, posterise: false, invert: false, sepia: false, greyscale: false, brightness: 0},
-    // {src: img2, x: 200, y: 200, width: 100, height: 100, rotation: 0, red: 0, green: 0, blue: 0, threshold: false, posterise: false, invert: false, sepia: false, greyscale: false, brightness: 0},
-    // {src: img3, x: 300, y: 300, width: 100, height: 100, rotation: 0, red: 0, green: 0, blue: 0, threshold: false, posterise: false, invert: false, sepia: false, greyscale: false, brightness: 0}
 ];
+
+let texts = []; 
+
+let embossConvolutionMatrix = [0,  0,  0,
+                               0,  2, -1,
+                               0, -1,  0]
+
+let blurConvolutionMatrix = [1, 2, 1,
+                             2, 4, 2,
+                             1, 2, 1]
+
+let sharpenConvolutionMatrix = [0,  -2,  0,
+                               -2, 11, -2,
+                                0,  -2,  0]
+
+let edgeDetectionConvolutionMatrix = [1,  1, 1,
+                                      1, -7, 1,
+                                      1,  1, 1]
+
+let noConvolutionMatrix = [0, 0, 0,
+                           0, 1, 0,
+                           0, 0, 0]
+
+
 
 let lastX = 0;
 let lastY = 0;
-
+let enteredText = "";
 let isDrawing = false;
 
 let drawBtn = null;
 let eraserBtn = null;
 let currentImageIndex = null;
+let currentTextIndex = null;
 
 let offsetX = 0;
 let offsetY = 0;
@@ -33,8 +54,6 @@ let radius = 10;
 let scribbleCanvas = null; 
 let scribbleCanvasCtx = null; 
 
-// let eraserCanvas = null;
-// let eraserCanvasCtx = null;
 let scribbleEnabled = false;
 let eraseEnabled = false;
 
@@ -58,6 +77,11 @@ function onAllAssetsLoaded() {
     scribbleCanvas.width = canvas.clientWidth;
     scribbleCanvas.height = canvas.clientHeight;
 
+    textCanvas = document.createElement("canvas");
+    textCanvasCtx = textCanvas.getContext("2d");
+    textCanvas.width = canvas.clientWidth;
+    textCanvas.height = canvas.clientHeight;
+
     renderCanvas();
 
     drawBtn = document.getElementById('sf_drawing');
@@ -70,12 +94,16 @@ function onAllAssetsLoaded() {
     window.onmousewheel = document.onmousewheel = mousewheelHandler;
 
     scribbleCanvasCtx.fillStyle = "black"
+    textCanvasCtx.fillStyle = "black"
 
     let insertBtn = document.getElementById('sf_insert');
     insertBtn.addEventListener("click", insertImage);
     let deleteBtn = document.getElementById('sf_delete');
     deleteBtn.addEventListener("click", deleteImage);
+    deleteBtn.addEventListener("click", deleteText);
     document.getElementById('sf_delete').addEventListener('click', deleteImage);
+    document.getElementById('sf_delete').addEventListener('click', deleteText);
+
 
     canvas.addEventListener('mousedown', startDrawingOrErasing);
     canvas.addEventListener('mousemove', drawOrErase);
@@ -85,8 +113,9 @@ function onAllAssetsLoaded() {
     ctx.font = "20px Arial";
     ctx.textAlign = "center"; 
     ctx.textBaseline = "middle";
-    ctx.fillText("UPLOAD IMG TO START", canvas.width / 2, canvas.height / 2);
+    ctx.fillText("Please upload an image", canvas.width / 2, canvas.height / 2);
 
+    renderTextCanvas();
     renderScribbleCanvas();
 }
 
@@ -94,12 +123,49 @@ function renderScribbleCanvas() {
     ctx.drawImage(scribbleCanvas, 0, 0, canvas.width, canvas.height);
 }
 
+
+function renderTextCanvas() {
+    textCanvasCtx.clearRect(0, 0, textCanvas.width, textCanvas.height);
+    texts.forEach((text, index) => {
+        textCanvasCtx.save(); 
+        textCanvasCtx.translate(text.x, text.y);
+        textCanvasCtx.rotate(Math.radians(text.rotation || 0));
+
+        textCanvasCtx.font = text.font;
+        textCanvasCtx.fillStyle = text.color;
+        textCanvasCtx.textAlign = text.align;
+        textCanvasCtx.textBaseline = text.baseline;
+
+        let textWidth = textCanvasCtx.measureText(text.content).width;
+        let textHeight = parseInt(text.font); 
+
+        if (index === currentTextIndex) {
+            textCanvasCtx.strokeStyle = "grey"; 
+            textCanvasCtx.lineWidth = 1; 
+            textCanvasCtx.strokeRect(
+                -textWidth / 2,
+                -textHeight / 2,
+                textWidth,
+                textHeight
+            ); 
+        }
+
+        textCanvasCtx.fillText(text.content, 0, 0);
+        textCanvasCtx.restore();
+    });
+
+    ctx.drawImage(textCanvas, 0, 0, canvas.width, canvas.height);
+}
+
+
+
+
 function renderCanvas() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     images.forEach((image, index) => {
         offscreenCanvasCtx.clearRect(0, 0, canvas.width, canvas.height);
         if (index === currentImageIndex) {
-            offscreenCanvasCtx.fillStyle = "darkgrey";
+            offscreenCanvasCtx.fillStyle = "lavender";
             offscreenCanvasCtx.save();
             offscreenCanvasCtx.translate((image.x + image.width / 2), (image.y + image.height / 2));
             offscreenCanvasCtx.rotate(Math.radians(image.rotation)); 
@@ -116,8 +182,8 @@ function renderCanvas() {
     });
     // ctx.drawImage(scribbleCanvas, 0, 0, canvas.width, canvas.height);
     renderScribbleCanvas();
+    renderTextCanvas();
 }
-
 
 function applyFilters(image, options) {
     const compositeOperations = {
@@ -262,51 +328,97 @@ window.addEventListener('DOMContentLoaded', function () {
     colorpicker.addEventListener('change', function () {
         changeToolbarColor();
     });
-
 });
 
 function mousedownHandler(e) {
-    if (e.which === 1) {
+    if (e.which === 1) { 
         let canvasBoundingRectangle = canvas.getBoundingClientRect();
-        mouseX = e.clientX - canvasBoundingRectangle.left;
-        mouseY = e.clientY - canvasBoundingRectangle.top;
-        let clickedInsideImage = false;
-        
-        for (let i = images.length - 1; i > -1; i--) {
-            if (mouseIsInsideImage(images[i].x, images[i].y, images[i].width, images[i].height, mouseX, mouseY)) {
-                if (!eraseEnabled) { 
-                    canvas.style.cursor = "pointer";
+        let mouseX = e.clientX - canvasBoundingRectangle.left;
+        let mouseY = e.clientY - canvasBoundingRectangle.top;
+
+        let clickedInsideText = false;
+        for (let i = texts.length - 1; i >= 0; i--) {
+            let text = texts[i];
+            let textWidth = ctx.measureText(text.content).width;
+            let textHeight = parseInt(text.font);
+
+            if (
+                mouseX >= text.x - textWidth / 2 &&
+                mouseX <= text.x + textWidth / 2 &&
+                mouseY >= text.y - textHeight / 2 &&
+                mouseY <= text.y + textHeight / 2
+            ) {
+                offsetX = mouseX - text.x;
+                offsetY = mouseY - text.y;
+                currentTextIndex = i;
+                clickedInsideText = true;
+                break;
+            }
+        }
+
+        if (!clickedInsideText) {
+            let clickedInsideImage = false;
+
+            for (let i = images.length - 1; i >= 0; i--) {
+                if (
+                    mouseIsInsideImage(
+                        images[i].x,
+                        images[i].y,
+                        images[i].width,
+                        images[i].height,
+                        mouseX,
+                        mouseY
+                    )
+                ) {
                     offsetX = mouseX - images[i].x;
                     offsetY = mouseY - images[i].y;
 
                     const clickedImage = images[i];
-                    images.splice(i, 1);  
+                    images.splice(i, 1); 
                     images.push(clickedImage);
 
                     currentImageIndex = images.length - 1; 
                     clickedInsideImage = true;
-                    renderCanvas();  
                     break;
                 }
             }
+
+            if (!clickedInsideImage) {
+                currentImageIndex = null; 
+            }
         }
 
-        if (!clickedInsideImage && !eraseEnabled) { 
-            canvas.style.cursor = "default";
-            currentImageIndex = null;
-            renderCanvas();
+        if (clickedInsideText) {
+            currentImageIndex = null; 
+        } else {
+            currentTextIndex = null; 
         }
+
+        renderCanvas(); 
     }
 }
 
 
+
 function moveHandler(e) {
-    if (!scribbleEnabled && currentImageIndex !== null && e.which === 1 && !eraseEnabled) { // Allow image movement only if eraser is not enabled
+    if (!scribbleEnabled && currentImageIndex !== null && e.which === 1 && !eraseEnabled) {
+        
+        currentTextIndex = null
         let canvasBoundingRectangle = canvas.getBoundingClientRect();
         mouseX = e.clientX - canvasBoundingRectangle.left;
         mouseY = e.clientY - canvasBoundingRectangle.top;
         images[currentImageIndex].x = mouseX - offsetX;
         images[currentImageIndex].y = mouseY - offsetY;
+        renderCanvas();
+    }
+    if (!scribbleEnabled && currentTextIndex !== null && e.which === 1 && !eraseEnabled) {
+        
+        currentImageIndex = null
+        let canvasBoundingRectangle = canvas.getBoundingClientRect();
+        mouseX = e.clientX - canvasBoundingRectangle.left;
+        mouseY = e.clientY - canvasBoundingRectangle.top;
+        texts[currentTextIndex].x = mouseX - offsetX;
+        texts[currentTextIndex].y = mouseY - offsetY;
         renderCanvas();
     }
     if (scribbleEnabled && e.which === 1) {
@@ -340,6 +452,23 @@ function mousewheelHandler(e) {
         images[currentImageIndex].y = oldCentreY - newHeight / 2;
         renderCanvas();
         }
+        if (currentTextIndex !== null) {
+            let canvasBoundingRectangle = canvas.getBoundingClientRect();
+            mouseX = e.clientX - canvasBoundingRectangle.left;
+            mouseY = e.clientY - canvasBoundingRectangle.top;
+            let oldWidth = texts[currentTextIndex].width;
+            let oldHeight = texts[currentTextIndex].height;
+            let scaleFactor = 1 - e.deltaY / 1200;
+            let oldCentreX = texts[currentTextIndex].x + oldWidth / 2;
+            let oldCentreY = texts[currentTextIndex].y + oldHeight / 2;
+            texts[currentTextIndex].width *= scaleFactor;
+            texts[currentTextIndex].height *= scaleFactor;
+            let newWidth = texts[currentTextIndex].width;
+            let newHeight = texts[currentTextIndex].height;
+            texts[currentTextIndex].x = oldCentreX - newWidth / 2;
+            texts[currentTextIndex].y = oldCentreY - newHeight / 2;
+            renderCanvas();
+            }
     }
 
 
@@ -363,12 +492,40 @@ function mouseIsInsideImage(imageTopLeftX, imageTopLeftY, imageWidth, imageHeigh
     }
     return true;
 }
+function mouseIsInsideText(textTopLeftX, textTopLeftY, textWidth, textHeight, x, y) {
+    if ((x > textTopLeftX) && (y > textTopLeftY)) {
+        if (x > textTopLeftX) {
+            if ((x - textTopLeftX) > textWidth) {
+                return false;
+            }
+        }
+        if (y > textTopLeftY) {
+            if ((y - textTopLeftY) > textHeight) {
+                return false;
+            }
+        }
+    } 
+    else 
+    {
+        return false;
+    }
+    return true;
+}
 
 //-----pullout bar filters
     function setRotationDegrees(newRotationDegrees) {
         images[currentImageIndex].rotation = parseInt(newRotationDegrees);
         renderCanvas();
     }
+    function setTextDegrees(newRotationDegrees) {
+        if (currentTextIndex !== null && currentTextIndex < texts.length) {
+            texts[currentTextIndex].rotation = parseInt(newRotationDegrees);
+            renderCanvas(); 
+        } else {
+            console.warn("No text is currently selected for rotation");
+        }
+    
+}
     function setBrightness(newBrightness) {
         images[currentImageIndex].brightness = parseInt(newBrightness);
         renderCanvas();
@@ -486,6 +643,13 @@ function color(newColor) {
     console.log(newColor)
     console.log("new color")
 }
+function colorText(newColor){
+    textCanvasCtx.fillStyle = newColor;
+    console.log("new color for text");
+    console.log("new colour")
+}
+
+
 function radiusSize(newRadiusSize) {
     radius = newRadiusSize;
 }
@@ -494,21 +658,11 @@ Math.radians = function (degrees) {
 }
 
 //-------text
-function renderTexts() {
-    texts.forEach((text) => {
-        ctx.font = text.font;
-        ctx.fillStyle = text.color;
-        ctx.textAlign = text.align;
-        ctx.textBaseline = text.baseline;
-        ctx.fillText(text.content, text.x, text.y);
-    });
-}
-
-function addText(content, font, color, align, baseline, x, y) {
+function addText(content, font, colorText, align, baseline, x, y) {
     let newText = {
         content: content,
         font: font,
-        color: color,
+        color: colorText,
         align: align,
         baseline: baseline,
         x: x,
@@ -520,6 +674,7 @@ function addText(content, font, color, align, baseline, x, y) {
 
 function deleteText(index) {
     texts.splice(index, 1);
+    console.log('deleted text')
     renderCanvas();
 }
 

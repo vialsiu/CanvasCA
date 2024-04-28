@@ -264,14 +264,14 @@ font-weight:400;
     accent-color:#b8bebb;
 }
 
-sf_textScale{
+sf_textrotate{
     background-color:rgb(144, 144, 144);
     accent-color:#b8bebb;
 }
 
 .sf_filterholder{
-    border-radius:0.5vw;
-    background-color:rgba(21, 21, 21, 0.269);
+    /* border-radius:0.5vw;
+    background-color:rgba(21, 21, 21, 0.269); */
     padding-top:0.5vw;
     padding-bottom:0.2vw;
     margin-bottom:1vh;
@@ -367,6 +367,18 @@ sf_textScale{
 }
 
 #sf_options{
+    width:16.6vw;
+    border:none;
+    background-color:#232323;
+    color:rgb(187, 187, 187);
+    font-size:1vw;
+    height:2vw;
+    padding-left:2%;
+    font-weight:600;
+}
+
+#sf_options2{
+    margin-top:1vh;
     width:16.6vw;
     border:none;
     background-color:#232323;
